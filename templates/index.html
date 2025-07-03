@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}Accueil - Luxury Akran{% endblock %}
+
+{% block content %}
+<section class="hero" style="background-image: url('{{ url_for('static', filename='images/hero_bg.jpg') }}');">
+    <div class="hero-content container">
+        <h1>Découvrez le Luxe à portée de main</h1>
+        <p>Votre source N°1 pour les articles de mode exclusifs, livrés en Afrique et dans le monde.</p>
+        <a href="{{ url_for('products_list') }}" class="btn btn-primary">Voir nos collections</a>
+    </div>
+</section>
+
+<section class="service-banner">
+    <div class="container">
+        <p><strong>Service client professionnel :</strong> Pour toute question, contactez-nous immédiatement via WhatsApp : 
+        <a href="https://wa.me/{{ config.WHATSAPP_NUMBER }}" target="_blank" style="color: #fff; font-weight: bold; text-decoration: underline;">
+            {{ config.WHATSAPP_NUMBER.replace('+XX', '+XX XXX XXXX') if config.WHATSAPP_NUMBER and config.WHATSAPP_NUMBER.startswith('+XX') else config.WHATSAPP_NUMBER }}
+        </a></p>
+    </div>
+</section>
+
+<section class="global-delivery">
+    <div class="container">
+        <h2><i class="fas fa-globe-africa"></i> Livraison Globale en Gros et en details !</h2>
+        <p>Nous expédions depuis l'Amérique vers de nombreux pays. votre sactisfaction est notre priorité !</p>
+        <div class="country-flags">
+            <span>CI</span> <span>SN</span> <span>CM</span> <span>NG</span> <span>GH</span> <span>ZA</span> <i class="fas fa-globe"></i>
+        </div>
+    </div>
+</section>
+
+<section class="popular-categories">
+    <div class="container">
+        <h2>Nos Catégories Populaires</h2>
+        <div class="categories-grid">
+            <a href="{{ url_for('products_list', category='Chaussures') }}" class="category-card">
+                <div class="category-icon"><i class="fas fa-shoe-prints fa-3x"></i></div>
+                <h3>Chaussures</h3>
+            </a>
+            <a href="{{ url_for('products_list', category='Sacs') }}" class="category-card">
+                <div class="category-icon"><i class="fas fa-shopping-bag fa-3x"></i></div>
+                <h3>Sacs</h3>
+            </a>
+            <a href="{{ url_for('products_list', category='Vêtements') }}" class="category-card">
+                <div class="category-icon"><i class="fas fa-tshirt fa-3x"></i></div>
+                <h3>Vêtements</h3>
+            </a>
+            <a href="{{ url_for('products_list', category='Montres') }}" class="category-card">
+                <div class="category-icon"><i class="fas fa-clock fa-3x"></i></div>
+                <h3>Montres</h3>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="how-to-buy">
+    <div class="container">
+        <h2>Comment Acheter ? C'est Simple !</h2>
+        <div class="steps">
+            <div class="step"><i class="fas fa-search"></i> Parcourez nos produits et trouvez votre article coup de cœur.</div>
+            <div class="step"><i class="fas fa-eye"></i> Consultez les détails de l'article.</div>
+            <div class="step"><i class="fab fa-whatsapp"></i> Cliquez sur "Contacter via WhatsApp" pour nous contacter.</div>
+            <div class="step"><i class="fas fa-dollar-sign"></i> Finalisez votre commande directement avec notre équipe.</div>
+        </div>
+    </div>
+</section>
+
+<section class="featured-products">
+    <div class="container">
+        <h2>Produits en Vedette</h2>
+        <div class="products-grid">
+            {% if featured_products %}
+                {% for p_item in featured_products %}
+                    {% set product = p_item %}
+                    {# 'favorite_product_ids' est passé par la route index #}
+                    {% include '_product_card.html' %}
+                {% endfor %}
+            {% else %}
+                <p>Aucun produit en vedette pour le moment.</p>
+            {% endif %}
+        </div>
+        {% if featured_products and featured_products|length >= 1 %}
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('products_list') }}" class="btn btn-secondary">Voir tous les produits</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

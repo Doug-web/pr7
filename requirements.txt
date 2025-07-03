@@ -1,0 +1,35 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Flask-WTF
+Werkzeug
+email-validator # for WTForms email validation
+
+Flask_Migrate
+
+
+WTForms
+itsdangerous
+Jinja2
+MarkupSafe
+
+# --- Base de données ---
+SQLAlchemy
+# Pour la base de données PostgreSQL (indispensable pour Render)
+psycopg2-binary
+# --- Serveur d'application WSGI (pour la production) ---
+gunicorn
+waitress
+
+# --- Traitement d'images ---
+Pillow
+
+# --- Utilitaires ---
+click
+python-dotenv
+
+# --- Sécurité ---
+
+blinker
+# --- Cache ---
+# Flask-Caching==2.0.2 # Vous l'avez commenté, mais si vous le réactivez, il faudra l'ajouter

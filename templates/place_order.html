@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container auth-form-container"> <!-- Réutiliser le style des formulaires d'auth/admin -->
+    <h2>{{ title }}</h2>
+    
+    <div style="margin-bottom: 20px; padding: 10px; background-color:#f9f9f9; border-radius: 5px;">
+        <h4>Détails du produit (pour information) :</h4>
+        <p><strong>Produit :</strong> {{ product.name }}</p>
+        <p><strong>Marque :</strong> {{ product.brand or 'N/A' }}</p>
+        <!-- L'affichage statique du prix ici est retiré car il est maintenant dans le formulaire -->
+    </div>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ form.product_name.label(class="form-label") }}
+            {{ form.product_name(class="form-control") }}
+        </div>
+
+        <!-- CHAMP DE FORMULAIRE POUR LE PRICE_INFO -->
+        <div class="form-group">
+            {{ form.price_info.label(class="form-label") }}
+            {{ form.price_info(class="form-control", placeholder="ex: 150€ ou Contacter pour prix") }}
+            {% if form.price_info.errors %}<div class="errors">{% for error in form.price_info.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+        </div>
+
+        <fieldset>
+            <legend style="font-size: 1.2em; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Vos Informations</legend>
+            <div class="form-group">
+                {{ form.customer_name.label(class="form-label") }}
+                {{ form.customer_name(class="form-control", placeholder="Ex: Jean Dupont") }}
+                {% if form.customer_name.errors %}<div class="errors">{% for error in form.customer_name.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.customer_email.label(class="form-label") }}
+                {{ form.customer_email(class="form-control", placeholder="Ex: jean.dupont@email.com") }}
+                {% if form.customer_email.errors %}<div class="errors">{% for error in form.customer_email.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.customer_phone.label(class="form-label") }}
+                {{ form.customer_phone(class="form-control", placeholder="Ex: +33 6 12 34 56 78") }}
+                {% if form.customer_phone.errors %}<div class="errors">{% for error in form.customer_phone.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.customer_address.label(class="form-label") }}
+                {{ form.customer_address(class="form-control", rows="3", placeholder="Numéro, Rue, Code Postal, Ville, Pays") }}
+                {% if form.customer_address.errors %}<div class="errors">{% for error in form.customer_address.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+            </div>
+        </fieldset>
+
+        <fieldset style="margin-top: 20px;">
+            <legend style="font-size: 1.2em; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Détails de la Commande</legend>
+             <div class="form-group">
+                {{ form.quantity.label(class="form-label") }}
+                {{ form.quantity(class="form-control", type="number", min="1") }}
+                {% if form.quantity.errors %}<div class="errors">{% for error in form.quantity.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.notes.label(class="form-label") }}
+                {{ form.notes(class="form-control", rows="3", placeholder="Instructions spéciales, préférences, etc.") }}
+                {% if form.notes.errors %}<div class="errors">{% for error in form.notes.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+            </div>
+        </fieldset>
+        
+        <div class="form-group" style="margin-top: 25px;">
+            {{ form.submit(class="btn btn-primary btn-block") }}
+        </div>
+    </form>
+    <p style="text-align: center; margin-top:15px;">
+        <a href="{{ url_for('product_detail', product_id=product.id) }}">Retour au produit</a>
+    </p>
+</div>
+{% endblock %}

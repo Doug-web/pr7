@@ -1,0 +1,203 @@
+{% extends "layout.html" %}
+
+{% block title %}Tableau de Bord Admin - Luxury Akran{% endblock %}
+
+{% block content %}
+<div class="container page-content admin-dashboard">
+    <h1>Tableau de Bord Administrateur</h1>
+
+    <!-- Section des statistiques rapides -->
+    <section class="admin-stats">
+        <h2>Statistiques Rapides</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3><i class="fas fa-box"></i> Produits</h3>
+                <p>{{ total_products or 0 }}</p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-shopping-cart"></i> Commandes</h3>
+                <p>{{ total_orders or 0 }}</p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-users"></i> Utilisateurs</h3>
+                <p>{{ total_users or 0 }}</p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-home"></i> Vues Page d'Accueil</h3>
+                <p>{{ home_page_views }}</p>
+            </div>
+        </div>
+        
+        <div class="top-lists-container">
+            <div class="top-list">
+                <h3>Top 10 Produits Commandés</h3>
+                {% if top_ordered_products %}
+                <ol>
+                    {% for product, order_count in top_ordered_products %}
+                    <li><a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-decoration-none">{{ product.name }}</a> ({{ order_count or 0 }} commande(s))</li>
+                    {% endfor %}
+                </ol>
+                {% else %}
+                <p>Aucune donnée de commande pour le moment.</p>
+                {% endif %}
+            </div>
+              
+            <div class="top-list">
+                <h3>Top 5 Produits les plus Vus</h3>
+                {% if most_viewed_products %}
+                <ol>
+                    {% for p in most_viewed_products %}
+                    <li><a href="{{url_for('product_detail', product_id=p.id)}}">{{p.name}}</a> ({{p.views or 0}} vues)</li>
+                    {% endfor %}
+                </ol>
+                {% else %}
+                <p>Aucune donnée de vue pour le moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Section des actions principales -->
+    <section class="admin-actions">
+        <h2>Actions</h2>
+        <a href="{{ url_for('add_product') }}" class="btn btn-success"><i class="fas fa-plus-circle"></i> Ajouter un Produit</a>
+        
+                
+        <!-- Les boutons de téléchargement ont été supprimés de cette section -->
+    </section>
+
+    <!-- Section de gestion des produits -->
+    <section class="admin-products-list">
+        <h2>Gérer les Produits</h2>
+        
+        <!-- Barre de recherche des produits -->
+        <div class="admin-product-search-form-container">
+            <div class="search-with-button-wrapper">
+                <input type="text" id="adminProductSearchInput" 
+                       placeholder="Rechercher un produit (nom, marque, catégorie)..." 
+                       value="{{ search_query or '' }}"
+                       class="form-control admin-search-input-field">
+                <button type="button" id="adminSearchButton" class="btn btn-search-admin">
+                    <i class="fas fa-search"></i> Rechercher
+                </button>
+            </div>
+        </div>
+
+        {% if products %}
+        <table id="adminProductsTable">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Nom</th>
+                    <th>Marque</th>
+                    <th>Catégorie</th>
+                    <th>Prix Info</th>
+                    <th>Vues</th>
+                    <th>Commandes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product, order_count in products %}
+                <tr class="product-row">
+                    <td><img src="{{ url_for('static', filename='images/products/' + product.image_file) }}" alt="{{ product.name }}" class="admin-thumb"></td>
+                    <td class="product-name">{{ product.name }}</td>
+                    <td class="product-brand">{{ product.brand or 'N/A' }}</td>
+                    <td class="product-category">{{ product.category or 'N/A' }}</td>
+                    <td>{{ product.price_info }}</td>
+                    <td>{{ product.views or 0 }}</td>
+                    <td>{{ order_count or 0 }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-sm btn-warning" title="Modifier"><i class="fas fa-edit"></i></a>
+                        <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Aucun produit à afficher. <a href="{{ url_for('add_product') }}">Ajoutez-en un !</a></p>
+        {% endif %}
+        
+        <!-- Message affiché si la recherche ne retourne aucun résultat -->
+        <div id="noResultsMessage" style="display: none; text-align: center; margin-top: 20px;">
+            <p>Aucun produit ne correspond à votre recherche.</p>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('adminProductSearchInput');
+    const productsTable = document.getElementById('adminProductsTable');
+    const noResultsMessage = document.getElementById('noResultsMessage');
+
+    // Vérifie si la table des produits existe avant d'ajouter des écouteurs d'événements
+    if (productsTable) {
+        const tableBody = productsTable.getElementsByTagName('tbody')[0];
+        const productRows = tableBody ? tableBody.getElementsByClassName('product-row') : [];
+        const searchButton = document.getElementById('adminSearchButton');
+
+        function filterProducts() {
+            // S'il n'y a aucune ligne de produit, il n'y a rien à filtrer
+            if (!productRows || productRows.length === 0) {
+                if (noResultsMessage) noResultsMessage.style.display = 'none';
+                return;
+            }
+
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            for (let i = 0; i < productRows.length; i++) {
+                const row = productRows[i];
+                const nameCell = row.querySelector('.product-name');
+                const brandCell = row.querySelector('.product-brand');
+                const categoryCell = row.querySelector('.product-category');
+
+                const name = nameCell ? nameCell.textContent.toLowerCase() : "";
+                const brand = brandCell ? brandCell.textContent.toLowerCase() : "";
+                const category = categoryCell ? categoryCell.textContent.toLowerCase() : "";
+
+                // La ligne est affichée si le terme de recherche est trouvé dans le nom, la marque ou la catégorie
+                if (name.includes(searchTerm) || brand.includes(searchTerm) || category.includes(searchTerm)) {
+                    row.style.display = ''; // Affiche la ligne
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none'; // Masque la ligne
+                }
+            }
+            
+            // Gère l'affichage du message "aucun résultat"
+            if (noResultsMessage) {
+                // Affiche le message seulement si une recherche a été effectuée et qu'aucun résultat n'est trouvé
+                if (visibleCount === 0 && searchTerm !== "") {
+                    noResultsMessage.style.display = 'block';
+                } else {
+                    noResultsMessage.style.display = 'none';
+                }
+            }
+        }
+
+        // Ajoute l'écouteur d'événement pour la saisie en temps réel
+        if (searchInput) {
+            searchInput.addEventListener('keyup', filterProducts);
+        }
+
+        // Ajoute l'écouteur d'événement pour le clic sur le bouton
+        if (searchButton) {
+            searchButton.addEventListener('click', filterProducts);
+        }
+
+        // S'il y a déjà du texte dans le champ au chargement de la page, lance le filtre
+        if (searchInput && searchInput.value.trim() !== '') {
+            filterProducts();
+        }
+    }
+});
+</script>
+{% endblock %}

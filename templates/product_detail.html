@@ -1,0 +1,85 @@
+<!-- START OF FILE product_detail.html -->
+
+{% extends "layout.html" %}
+
+{% block title %}{{ product.name }} - Luxury Akran{% endblock %}
+
+{% block content %}
+<div class="container page-content product-detail-page">
+    <div class="product-image-column">
+        <img src="{{ url_for('static', filename='images/products/' + product.image_file) }}" alt="{{ product.name }}" class="product-main-image" loading="lazy" decoding="async">
+    </div>
+    <div class="product-info-column">
+        <h1>{{ product.name }}</h1>
+        <p class="brand"><strong>Marque :</strong> {{ product.brand or 'N/A' }}</p>
+        <p class="price-info"><strong>Prix :</strong> {{ product.price_info }}</p>
+        
+        <div class="description">
+            <h3>Description</h3>
+            <p>{{ product.description | nl2br or 'Aucune description disponible.' }}</p>
+        </div>
+
+        {% if product.tags %}
+        <div class="tags">
+            <strong>Tags :</strong> 
+            {% for tag in product.tags.split(',') %}
+                <span class="tag">{{ tag.strip() }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="product-actions" style="margin-top: 20px; margin-bottom: 15px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+            {% if current_user.is_authenticated and current_user.is_admin %}
+            <a href="{{ url_for('place_order', product_id=product.id) }}" class="btn btn-primary">
+                <i class="fas fa-shopping-cart"></i> Commander (Admin)
+            </a>
+            {% endif %}
+
+            {# Ce lien utilise maintenant la variable whatsapp_link enrichie depuis la route Python #}
+            <a href="{{ whatsapp_link }}" target="_blank" class="btn btn-whatsapp">
+                <i class="fab fa-whatsapp"></i> Contacter via WhatsApp
+            </a>
+            
+            {% if current_user.is_authenticated %}
+                {% if not current_user.is_admin %} {# Utilisateur connecté ET n'est PAS admin #}
+                <form action="{{ url_for('toggle_favorite', product_id=product.id) }}" method="POST" style="display: inline-block;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    {% if product.id in favorite_product_ids %}
+                        <button type="submit" class="btn btn-danger" title="Retirer des favoris">
+                            <i class="fas fa-heart"></i> Retirer des Favoris
+                        </button>
+                    {% else %}
+                        <button type="submit" class="btn btn-outline-danger" title="Ajouter aux favoris">
+                            <i class="far fa-heart"></i> Ajouter aux Favoris
+                        </button>
+                    {% endif %}
+                </form>
+                {% endif %} {# Fin de la condition 'not current_user.is_admin' #}
+            {% else %} {# Utilisateur NON connecté #}
+                <a href="{{ url_for('login', next=request.url, reason='favorites') }}" class="btn btn-outline-danger" title="Connectez-vous pour ajouter aux favoris">
+                    <i class="far fa-heart"></i> Ajouter aux Favoris
+                </a>
+            {% endif %}
+        </div>
+
+        <p class="views-count">Vu {{ product.views }} fois</p>
+
+    </div> {# Fin de product-info-column #}
+</div> {# Fin de .product-detail-page #}
+
+
+{# SECTION DES RECOMMANDATIONS DE PRODUITS #}
+{% if recommended_products %}
+<section class="related-products container page-content" style="margin-top: 40px;">
+    <h2>Vous pourriez aussi aimer...</h2>
+    <div class="products-grid">
+        {% for product_item in recommended_products %}
+            {% set product = product_item %} {# _product_card s'attend à 'product' #}
+            {# 'favorite_product_ids' est passé par la route product_detail et sera utilisé par _product_card.html #}
+            {% include '_product_card.html' %} 
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

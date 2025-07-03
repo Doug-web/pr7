@@ -1,0 +1,184 @@
+  {%extend layout.html%}
+  {% block title %}{{ title }} - Admin{% endblock %}
+
+  {% block content %}
+  <div class="container page-content auth-form-container">
+      <h2>{{ title }}</h2>
+      <form method="POST" id="orderForm">
+          {{ form.hidden_tag() }}
+          
+          <fieldset>
+              <legend>Informations Client</legend>
+              <div class="form-group">
+                  {{ form.customer_name.label(class="form-label") }}
+                  {{ form.customer_name(class="form-control") }}
+                  {% if form.customer_name.errors %}<div class="errors">{% for error in form.customer_name.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+              </div>
+              <div class="row">
+                  <div class="col-md-6 form-group">
+                      {{ form.customer_email.label(class="form-label") }}
+                      {{ form.customer_email(class="form-control") }}
+                      {% if form.customer_email.errors %}<div class="errors">{% for error in form.customer_email.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+                  </div>
+                  <div class="col-md-6 form-group">
+                      {{ form.customer_phone.label(class="form-label") }}
+                      {{ form.customer_phone(class="form-control") }}
+                      {% if form.customer_phone.errors %}<div class="errors">{% for error in form.customer_phone.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+                  </div>
+              </div>
+          </fieldset>
+
+          <fieldset>
+              <legend>Produits Commandés</legend>
+              <div id="orderItemsContainer">
+                  {% for item_form in form.items %}
+                  <div class="order-item-entry mb-3 p-3 border rounded">
+                      <h4>Produit #{{ loop.index }}</h4>
+                      {{ item_form.hidden_tag() }} {# Important pour les sous-formulaires #}
+                      <div class="form-group">
+                          {{ item_form.product_id.label(class="form-label") }}
+                          {{ item_form.product_id(class="form-control product-select") }}
+                          {% if item_form.product_id.errors %}<div class="errors">{% for error in item_form.product_id.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+                      </div>
+                      <div class="row">
+                          <div class="col-md-6 form-group">
+                              {{ item_form.quantity.label(class="form-label") }}
+                              {{ item_form.quantity(class="form-control quantity-input") }}
+                              {% if item_form.quantity.errors %}<div class="errors">{% for error in item_form.quantity.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+                          </div>
+                          <div class="col-md-6 form-group">
+                              {{ item_form.price.label(class="form-label") }}
+                              {{ item_form.price(class="form-control price-input", placeholder="Prix auto si vide") }}
+                              <small class="form-text text-muted product-price-hint" style="display:none;"></small>
+                              {% if item_form.price.errors %}<div class="errors">{% for error in item_form.price.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+                          </div>
+                      </div>
+                      {% if form.items|length > 1 %}
+                      <button type="button" class="btn btn-sm btn-danger remove-item-btn">Supprimer Produit</button>
+                      {% endif %}
+                  </div>
+                  {% endfor %}
+              </div>
+              <button type="button" id="addOrderItemBtn" class="btn btn-info mt-2"><i class="fas fa-plus"></i> Ajouter un autre produit</button>
+          </fieldset>
+          
+          <fieldset>
+              <legend>Détails Commande</legend>
+              <div class="form-group">
+                  {{ form.status.label(class="form-label") }}
+                  {{ form.status(class="form-control") }}
+                  {% if form.status.errors %}<div class="errors">{% for error in form.status.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+              </div>
+              <div class="form-group">
+                  {{ form.notes.label(class="form-label") }}
+                  {{ form.notes(class="form-control", rows="3") }}
+                  {% if form.notes.errors %}<div class="errors">{% for error in form.notes.errors %}<span>{{ error }}</span>{% endfor %}</div>{% endif %}
+              </div>
+          </fieldset>
+
+          <div class="form-group mt-4">
+              {{ form.submit(class="btn btn-primary btn-lg") }}
+          </div>
+      </form>
+  </div>
+  {% endblock %}
+
+  {% block scripts %}
+  <script>
+  // Petit script pour gérer l'ajout/suppression dynamique d'items
+  // et la mise à jour du prix si un produit est sélectionné
+  document.addEventListener('DOMContentLoaded', function() {
+      const productsData = [
+          {% for p in Product.query.all() %}
+          { id: {{ p.id }}, name: "{{ p.name|e }}", price: {{ p.numeric_price or 'null' }} },
+          {% endfor %}
+      ];
+
+      function updatePriceHint(selectElement) {
+          const selectedProductId = parseInt(selectElement.value);
+          const product = productsData.find(p => p.id === selectedProductId);
+          const itemEntry = selectElement.closest('.order-item-entry');
+          const priceInput = itemEntry.querySelector('.price-input');
+          const priceHint = itemEntry.querySelector('.product-price-hint');
+
+          if (product && product.price !== null) {
+              if (!priceInput.value) { // Auto-fill only if price field is empty
+                  // priceInput.value = product.price.toFixed(2); // Optionnel: auto-remplir
+              }
+              priceHint.textContent = `Prix suggéré: ${product.price.toFixed(2)} €`;
+              priceHint.style.display = 'block';
+          } else {
+              priceHint.style.display = 'none';
+              priceHint.textContent = '';
+          }
+      }
+
+      document.querySelectorAll('.product-select').forEach(select => {
+          updatePriceHint(select); // Initial check
+          select.addEventListener('change', function() {
+              updatePriceHint(this);
+          });
+      });
+      
+      let itemIndex = {{ form.items|length }}; // Commence après les items existants
+      const container = document.getElementById('orderItemsContainer');
+      const addBtn = document.getElementById('addOrderItemBtn');
+      
+      if (addBtn) {
+          addBtn.addEventListener('click', function() {
+              const newItemHtml = `
+              <div class="order-item-entry mb-3 p-3 border rounded">
+                  <h4>Produit #${itemIndex + 1}</h4>
+                  <input type="hidden" name="items-${itemIndex}-csrf_token" value="not_used_but_needed_by_fieldlist"> {# Peut être nécessaire #}
+                  <div class="form-group">
+                      <label class="form-label" for="items-${itemIndex}-product_id">Produit</label>
+                      <select class="form-control product-select" id="items-${itemIndex}-product_id" name="items-${itemIndex}-product_id">
+                          <option value="0">--- Choisir un produit ---</option>
+                          ${productsData.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+                      </select>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-6 form-group">
+                          <label class="form-label" for="items-${itemIndex}-quantity">Quantité</label>
+                          <input class="form-control quantity-input" id="items-${itemIndex}-quantity" name="items-${itemIndex}-quantity" type="number" value="1">
+                      </div>
+                      <div class="col-md-6 form-group">
+                          <label class="form-label" for="items-${itemIndex}-price">Prix Unitaire (automatique ou manuel)</label>
+                          <input class="form-control price-input" id="items-${itemIndex}-price" name="items-${itemIndex}-price" placeholder="Prix auto si vide" type="number" step="0.01">
+                          <small class="form-text text-muted product-price-hint" style="display:none;"></small>
+                      </div>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-danger remove-item-btn">Supprimer Produit</button>
+              </div>`;
+              container.insertAdjacentHTML('beforeend', newItemHtml);
+              
+              // Ré-attacher les écouteurs pour le nouveau select
+              const newSelect = container.lastElementChild.querySelector('.product-select');
+              updatePriceHint(newSelect);
+              newSelect.addEventListener('change', function() { updatePriceHint(this); });
+
+              // Ré-attacher l'écouteur pour le nouveau bouton de suppression
+              container.lastElementChild.querySelector('.remove-item-btn').addEventListener('click', removeItemAction);
+              
+              itemIndex++;
+          });
+      }
+
+      function removeItemAction(event) {
+          if (document.querySelectorAll('.order-item-entry').length > 1) {
+              event.target.closest('.order-item-entry').remove();
+          } else {
+              alert("Une commande doit contenir au moins un produit.");
+          }
+      }
+
+      container.addEventListener('click', function(event) {
+          if (event.target.classList.contains('remove-item-btn')) {
+              removeItemAction(event);
+          }
+      });
+  });
+  </script>
+  {% endblock %}
+  
+ 

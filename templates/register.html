@@ -1,0 +1,72 @@
+{# templates/register.html #}
+{% extends "layout.html" %}
+
+{% block title %}{{ title }} - Luxury Akran{% endblock %}
+
+{% block content %}
+<div class="container auth-form-container">
+    <h2>{{ title }}</h2>
+    <form method="POST" action="{{ url_for('register') }}">
+        {{ form.hidden_tag() }} {# Important pour la protection CSRF #}
+
+        <div class="form-group">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control", placeholder="Votre nom d'utilisateur") }}
+            {% if form.username.errors %}
+                <div class="errors">
+                    {% for error in form.username.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control", placeholder="Votre adresse email") }}
+            {% if form.email.errors %}
+                <div class="errors">
+                    {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# AJOUT DU CHAMP PAYS #}
+        <div class="form-group">
+            {{ form.country.label(class="form-label") }}
+            {{ form.country(class="form-control") }} {# WTForms s'occupe de rendre le <select> avec les <option> #}
+            {% if form.country.errors %}
+                <div class="errors">
+                    {% for error in form.country.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        {# FIN DE L'AJOUT DU CHAMP PAYS #}
+
+        <div class="form-group">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", placeholder="Créez un mot de passe") }}
+            {% if form.password.errors %}
+                <div class="errors">
+                    {% for error in form.password.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form.confirm_password.label(class="form-label") }}
+            {{ form.confirm_password(class="form-control", placeholder="Confirmez votre mot de passe") }}
+            {% if form.confirm_password.errors %}
+                <div class="errors">
+                    {% for error in form.confirm_password.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary btn-block") }} {# btn-block pour pleine largeur si désiré #}
+        </div>
+    </form>
+    <p class="text-center mt-3">
+        Déjà un compte ? <a href="{{ url_for('login') }}">Connectez-vous ici</a>.
+    </p>
+</div>
+{% endblock %}

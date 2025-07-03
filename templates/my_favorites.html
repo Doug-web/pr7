@@ -1,0 +1,66 @@
+
+
+{% extends "layout.html" %}
+
+{% block title %}{{ title }} - Luxury Akran{% endblock %}
+
+{% block content %}
+<div class="container page-content">
+    <h1>{{ title }}</h1>
+
+    {% if products and products|length > 0 %}
+        <div class="products-grid">
+            {% for p_item in products %} {# Utiliser p_item pour éviter conflit avec un 'product' global #}
+                {% set product = p_item %} {# _product_card s'attend à 'product' #}
+                {# 'favorite_product_ids' est passé par la route my_favorites et contient les IDs des produits actuellement affichés #}
+                {% include '_product_card.html' %}
+            {% endfor %}
+        </div>
+
+        {# Pagination pour les favoris #}
+        {% if products_pagination and products_pagination.pages > 1 %}
+        <nav aria-label="Page navigation des favoris" class="pagination-nav" style="margin-top: 30px; display: flex; justify-content: center;">
+            <ul class="pagination">
+                {# Lien Précédent #}
+                {% if products_pagination.has_prev %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('my_favorites', page=products_pagination.prev_num) }}">Précédent</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Précédent</span></li>
+                {% endif %}
+
+                {# Liens des pages #}
+                {% for page_num in products_pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        {% if products_pagination.page == page_num %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('my_favorites', page=page_num) }}">{{ page_num }}</a></li>
+                        {% endif %}
+                    {% else %}
+                        {# Ellipsis pour les pages sautées #}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {# Lien Suivant #}
+                {% if products_pagination.has_next %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('my_favorites', page=products_pagination.next_num) }}">Suivant</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Suivant</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <div style="text-align: center; padding: 40px 0;">
+            <i class="fas fa-heart-broken fa-3x" style="color: #ccc; margin-bottom: 20px;"></i>
+            <p>Votre liste de favoris est vide pour le moment.</p>
+            <p>Parcourez nos produits et ajoutez ceux qui vous plaisent !</p>
+            <a href="{{ url_for('products_list') }}" class="btn btn-primary" style="margin-top: 15px;">
+                <i class="fas fa-search"></i> Découvrir nos produits
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

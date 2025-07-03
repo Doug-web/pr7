@@ -1,0 +1,203 @@
+{% extends "layout.html" %}
+
+{% block title %}Nos Collections - Luxury Akran{% endblock %}
+
+{% block content %}
+<div class="container page-content">
+    <h1>Nos Collections</h1>
+    
+    <!-- Conteneur pour afficher le statut de la recherche active -->
+    <div id="searchStatusContainer" style="margin-bottom: 20px; display: none;"></div>
+
+    <form id="filtersForm" class="filters-form">
+        <div class="filter-group">
+            <label for="categoryFilter">Catégorie :</label>
+            <select name="category" id="categoryFilter">
+                <option value="all">Toutes les catégories</option>
+                {% for cat in categories %} 
+                <option value="{{ cat }}" {% if initial_category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="brandFilter">Marque :</label>
+            <select name="brand" id="brandFilter">
+                <option value="all">Toutes les marques</option>
+                {% for b in brands %}
+                <option value="{{ b }}" {% if initial_brand == b %}selected{% endif %}>{{ b }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="genderFilter">Genre :</label>
+            <select name="gender" id="genderFilter">
+                <option value="all">Tous les genres</option>
+                {% for g in genders %} 
+                <option value="{{ g }}" {% if initial_gender == g %}selected{% endif %}>{{ g }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    <div id="productsGridContainer" class="products-grid">
+        <p class="loading-message">Chargement des produits...</p>
+    </div>
+
+    <nav id="paginationContainer" aria-label="Page navigation" class="pagination-nav" style="display: none;">
+        <!-- La pagination sera injectée ici par JavaScript -->
+    </nav>
+    <p id="noProductsMessage" style="display: none; text-align: center; margin-top: 20px;">Aucun produit ne correspond à votre sélection.</p>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Références aux éléments du DOM
+    const filtersForm = document.getElementById('filtersForm');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const brandFilter = document.getElementById('brandFilter');
+    const genderFilter = document.getElementById('genderFilter'); 
+    const searchStatusContainer = document.getElementById('searchStatusContainer');
+    const headerSearchInput = document.getElementById('headerSearchInput');
+    
+    const productsGridContainer = document.getElementById('productsGridContainer');
+    const paginationContainer = document.getElementById('paginationContainer');
+    const noProductsMessage = document.getElementById('noProductsMessage');
+
+    // Variables d'état
+    let currentPage = 1;
+    let currentQuery = '';
+
+    // --- DÉBUT DE LA CORRECTION ---
+    // La fonction buildProductCard est mise à jour pour correspondre à la structure de _product_card.html
+    function buildProductCard(product) {
+        let favorite_button_html = '';
+        if (flaskGlobalIsAuthenticated) {
+            if (!flaskGlobalIsAdmin) {
+                const action_url = flaskGlobalToggleFavoriteUrl.replace('/0', '/' + product.id); 
+                favorite_button_html = `
+                <form action="${action_url}" method="POST" style="display: inline-block; flex-shrink: 0;">
+                    <input type="hidden" name="csrf_token" value="${flaskGlobalCsrfToken}"/>
+                    ${product.is_favorite 
+                        ? `<button type="submit" class="btn btn-sm btn-danger" title="Retirer des favoris"><i class="fas fa-heart"></i></button>`
+                        : `<button type="submit" class="btn btn-sm btn-outline-danger" title="Ajouter aux favoris"><i class="far fa-heart"></i></button>`
+                    }
+                </form>`;
+            }
+        } else {
+            const loginUrlWithNext = `${flaskGlobalLoginUrl}?next=${encodeURIComponent(window.location.href)}&reason=favorites`;
+            favorite_button_html = `<a href="${loginUrlWithNext}" class="btn btn-sm btn-outline-danger" title="Connectez-vous pour ajouter aux favoris"><i class="far fa-heart"></i></a>`;
+        }
+
+        // La structure HTML générée ici est maintenant IDENTIQUE à celle du fichier _product_card.html
+        return `
+            <div class="product-card">
+                <a href="${product.detail_url}">
+                    <div class="product-image-wrapper">
+                        <img src="${product.image_file}" alt="${product.name}" loading="lazy" decoding="async">
+                    </div>
+                    <h3>${product.name}</h3>
+                </a>
+                <div class="product-card-info">
+                    <p class="brand">Marque : ${product.brand}</p>
+                    <p class="price">${product.price_info}</p>
+                </div>
+                <div class="product-card-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 5px;">
+                    <a href="${product.detail_url}" class="btn btn-details btn-sm" style="flex-grow: 1;">Voir Détails</a>
+                    ${favorite_button_html}
+                </div>
+            </div>`;
+    }
+    // --- FIN DE LA CORRECTION ---
+
+
+    function buildPagination(paginationData) {
+        if (!paginationData || paginationData.total_pages <= 1) { paginationContainer.innerHTML = ''; paginationContainer.style.display = 'none'; return; }
+        let pHTML = '<ul class="pagination">';
+        pHTML += paginationData.has_prev ? `<li class="page-item"><a class="page-link" href="#" data-page="${paginationData.prev_num}">Précédent</a></li>` : '<li class="page-item disabled"><span class="page-link">Précédent</span></li>';
+        for (let i = 1; i <= paginationData.total_pages; i++) { pHTML += `<li class="page-item ${i === paginationData.page ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`; }
+        pHTML += paginationData.has_next ? `<li class="page-item"><a class="page-link" href="#" data-page="${paginationData.next_num}">Suivant</a></li>` : '<li class="page-item disabled"><span class="page-link">Suivant</span></li>';
+        pHTML += '</ul>';
+        paginationContainer.innerHTML = pHTML; paginationContainer.style.display = 'flex';
+        paginationContainer.querySelectorAll('.page-link[data-page]').forEach(l => l.addEventListener('click', e => { e.preventDefault(); currentPage = parseInt(e.target.dataset.page); fetchProducts(getCurrentFilters()); productsGridContainer.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+    }
+
+    function updateSearchStatusUI() {
+        if (currentQuery) {
+            searchStatusContainer.innerHTML = `
+                <div class="search-status">
+                    <span>Résultats pour : <strong>"${escapeHTML(currentQuery)}"</strong></span>
+                    <button id="clearSearchBtn" class="btn btn-sm" title="Effacer la recherche">×</button>
+                </div>`;
+            searchStatusContainer.style.display = 'block';
+            document.getElementById('clearSearchBtn').addEventListener('click', () => {
+                currentQuery = '';
+                if (headerSearchInput) { headerSearchInput.value = ''; }
+                updateSearchStatusUI();
+                handleFilterChange();
+            });
+        } else {
+            searchStatusContainer.innerHTML = '';
+            searchStatusContainer.style.display = 'none';
+        }
+    }
+
+    async function updateBrandFilter() {
+        const selectedCategory = categoryFilter.value; const currentBrand = brandFilter.value; brandFilter.disabled = true; brandFilter.innerHTML = '<option>Chargement...</option>';
+        try {
+            const response = await fetch(`/api/filter_options?category=${encodeURIComponent(selectedCategory)}`); if (!response.ok) throw new Error('Failed to fetch brands');
+            const data = await response.json(); brandFilter.innerHTML = '<option value="all">Toutes les marques</option>';
+            data.brands.forEach(brand => { const option = document.createElement('option'); option.value = brand; option.textContent = brand; brandFilter.appendChild(option); });
+            if (data.brands.includes(currentBrand)) { brandFilter.value = currentBrand; }
+        } catch (error) { console.error("Erreur mise à jour marques:", error); brandFilter.innerHTML = '<option value="all">Erreur</option>'; } finally { brandFilter.disabled = false; }
+    }
+
+    async function fetchProducts(filters = {}) {
+        filtersForm.querySelectorAll('select').forEach(el => el.disabled = true); productsGridContainer.style.opacity = '0.5'; productsGridContainer.innerHTML = '<p class="loading-message">Chargement des produits...</p>'; noProductsMessage.style.display = 'none'; paginationContainer.style.display = 'none';
+        const params = new URLSearchParams(); params.append('page', currentPage);
+        if (filters.query) params.append('query', filters.query); if (filters.category && filters.category !== 'all') params.append('category', filters.category); if (filters.brand && filters.brand !== 'all') params.append('brand', filters.brand); if (filters.gender && filters.gender !== 'all') params.append('gender', filters.gender);
+        const newUrl = `${window.location.pathname}?${params.toString()}`; window.history.pushState({path: newUrl}, '', newUrl);
+        try {
+            const response = await fetch(`/api/products_filter?${params.toString()}`); if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json(); productsGridContainer.innerHTML = '';
+            if (data.products && data.products.length > 0) { data.products.forEach(product => productsGridContainer.insertAdjacentHTML('beforeend', buildProductCard(product))); buildPagination(data.pagination); } else { noProductsMessage.style.display = 'block'; }
+        } catch (error) { console.error("Erreur récupération produits:", error); productsGridContainer.innerHTML = '<p class="error-message" style="text-align:center; color:red;">Impossible de charger les produits.</p>'; } finally { filtersForm.querySelectorAll('select').forEach(el => el.disabled = false); if(brandFilter.innerHTML.includes('Chargement...')) {} else { brandFilter.disabled = false; } productsGridContainer.style.opacity = '1'; }
+    }
+
+    function getCurrentFilters() { return { query: currentQuery, category: categoryFilter.value, brand: brandFilter.value, gender: genderFilter.value }; }
+    function handleFilterChange(resetPage = true) { if (resetPage) { currentPage = 1; } fetchProducts(getCurrentFilters()); }
+    function escapeHTML(str) { const p = document.createElement('p'); p.appendChild(document.createTextNode(str)); return p.innerHTML; }
+
+    // ÉCOUTEURS D'ÉVÉNEMENTS
+    categoryFilter.addEventListener('change', async () => { brandFilter.value = 'all'; await updateBrandFilter(); handleFilterChange(); });
+    brandFilter.addEventListener('change', () => handleFilterChange());
+    genderFilter.addEventListener('change', () => handleFilterChange());
+
+    // INITIALISATION DE LA PAGE
+    async function initializePage() {
+        const initialUrlParams = new URLSearchParams(window.location.search);
+        currentPage = parseInt(initialUrlParams.get('page')) || 1;
+        currentQuery = initialUrlParams.get('query') || '';
+        
+        if (headerSearchInput) { headerSearchInput.value = currentQuery; }
+        
+        updateSearchStatusUI();
+
+        categoryFilter.value = initialUrlParams.get('category') || 'all';
+        genderFilter.value = initialUrlParams.get('gender') || 'all';
+        await updateBrandFilter();
+        const initialBrand = initialUrlParams.get('brand'); if (initialBrand) { brandFilter.value = initialBrand; }
+        fetchProducts(getCurrentFilters());
+    }
+
+    initializePage();
+    window.addEventListener('popstate', () => initializePage());
+});
+</script>
+
+<style>
+.search-status{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;background-color:#e2f3ff;border:1px solid #b6dfff;border-radius:8px;color:#005a9e}.search-status strong{color:#004085}.search-status button{background:0 0;border:1px solid transparent;font-size:1.5rem;line-height:1;cursor:pointer;padding:0 8px;color:#005a9e;border-radius:50%;transition:background-color .2s,border-color .2s}.search-status button:hover{background-color:rgba(255,255,255,.5);border-color:#005a9e}
+</style>
+{% endblock %}
