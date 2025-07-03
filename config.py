@@ -28,8 +28,11 @@ class Config:
     # --- CONFIGURATION POUR LES UPLOADS D'IMAGES ---
     # On stocke les images dans un dossier temporaire à l'intérieur du projet.
     # Rappel : ces images disparaîtront lors des redéploiements sur le plan gratuit.
-    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'instance', 'uploads')
+   UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'images', 'products')
+    
+    # On s'assure que ce dossier existe au démarrage de l'app.
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
     # Pour le placeholder de WhatsApp
