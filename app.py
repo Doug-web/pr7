@@ -309,16 +309,18 @@ def product_detail(product_id):
         title=f"{product.name} - Luxury Akran"
     )
 
-@app.route('/uploads/<path:filename>')# ajout
-def serve_uploaded_file(filename):
+# --- DANS app.py ---
+
+# --- NOUVELLE ROUTE POUR SERVIR LES IMAGES DEPUIS LE DISQUE PERSISTANT (CORRIGÉE) ---
+@app.route('/uploads/<path:path>')
+def serve_uploaded_file(path):
     """
-    Sert les fichiers depuis le dossier de base des uploads.
-    Ceci est nécessaire car UPLOAD_FOLDER est maintenant en dehors de 'static'.
+    Sert les fichiers depuis le dossier de base des uploads configuré dans config.py.
+    Ceci est nécessaire car le dossier d'upload est maintenant en dehors de 'static'.
+    Le chemin inclut des sous-dossiers comme 'products/image.jpg'.
     """
-    # On utilise UPLOADS_BASE_PATH qui est '/var/data/uploads' sur Render
-    # ou le dossier 'uploads' localement.
     base_path = current_app.config['UPLOADS_BASE_PATH']
-    return send_from_directory(base_path, filename)
+    return send_from_directory(base_path, path)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
