@@ -1,10 +1,13 @@
 
 
+
+
 <div class="product-card">
     <a href="{{ url_for('product_detail', product_id=product.id) }}">
         <!-- NOUVEAU : Un conteneur pour l'image -->
         <div class="product-image-wrapper">
-            <img src="{{ url_for('static', filename='images/products/' + product.image_file) }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+            <!-- MODIFICATION CI-DESSOUS -->
+            <img src="{{ url_for('serve_uploaded_file', path='products/' + product.image_file) }}" alt="{{ product.name }}" loading="lazy" decoding="async">
         </div>
         <h3>{{ product.name }}</h3>
     </a>
