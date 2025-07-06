@@ -2,7 +2,7 @@
 
 import os, csv, io, random, secrets
 from datetime import datetime,timedelta
-from flask import Flask, current_app, render_template, redirect, request, url_for, flash, request, send_file, abort, jsonify, session
+from flask import Flask, current_app, render_template, redirect, request, url_for, flash, request, send_file, abort, jsonify, session,send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
@@ -181,10 +181,10 @@ def products_list():
 #@cache.cached(timeout=300, query_string=True)
 def api_products_filter():
     """
-    MODIFIÉ: On ré-ajoute la logique de filtrage par 'query'.
+    MODIFIÉ: L'URL de l'image pointe maintenant vers la nouvelle route 'serve_uploaded_file'.
     """
     page = request.args.get('page', 1, type=int)
-    query_param = request.args.get('query', '', type=str) # <-- RÉ-AJOUTÉ
+    query_param = request.args.get('query', '', type=str)
     category_filter = request.args.get('category', 'all', type=str)
     brand_filter = request.args.get('brand', 'all', type=str)
     gender_filter = request.args.get('gender', 'all', type=str)
@@ -192,7 +192,6 @@ def api_products_filter():
 
     products_query = Product.query.order_by(Product.added_date.desc())
 
-    # La condition sur query_param est de retour
     if query_param:
         products_query = products_query.filter(Product.name.ilike(f'%{query_param}%'))
     if category_filter != 'all' and category_filter:
@@ -202,7 +201,6 @@ def api_products_filter():
     if gender_filter != 'all' and gender_filter:
         products_query = products_query.filter(Product.gender == gender_filter)
     
-    # ... le reste de la fonction api_products_filter est identique ...
     try:
         products_pagination = products_query.paginate(page=page, per_page=per_page, error_out=False)
     except Exception as e:
@@ -218,8 +216,9 @@ def api_products_filter():
             'name': product.name,
             'brand': product.brand or 'N/A',
             'price_info': product.price_info,
-            'image_file': url_for('static', filename=f'images/products/{product.image_file}', _external=False),
-            'detail_url': url_for('product_detail', product_id=product.id, _external=False),
+            # MODIFIÉ : Utilise la nouvelle route pour servir les images
+            'image_file': url_for('serve_uploaded_file', path=f'products/{product.image_file}'),
+            'detail_url': url_for('product_detail', product_id=product.id),
             'is_favorite': product.id in user_favorite_ids
         })
     
@@ -266,25 +265,19 @@ def api_filter_options():
 @app.route('/product/<int:product_id>')
 def product_detail(product_id):
     """
-    Affiche la page de détail d'un produit.
+    MODIFIÉ: L'URL de l'image pour le lien WhatsApp pointe vers 'serve_uploaded_file'.
     """
     product = Product.query.get_or_404(product_id)
     
     if not (current_user.is_authenticated and current_user.is_admin):
-        # Si la condition est vraie, on compte la vue.
         product.views = (product.views or 0) + 1
         db.session.commit()
     
-    # --- LOGIQUE DE MISE À JOUR POUR LE LIEN WHATSAPP ---
-    
-    # 1. Obtenir l'URL complète de la page du produit (essentiel pour les liens externes)
     product_page_url = url_for('product_detail', product_id=product.id, _external=True)
 
-    # 2. Obtenir l'URL complète de l'image du produit
-    product_image_url = url_for('static', filename=f'images/products/{product.image_file}', _external=True)
+    # MODIFIÉ : Utilise la nouvelle route pour obtenir l'URL de l'image
+    product_image_url = url_for('serve_uploaded_file', path=f'products/{product.image_file}', _external=True)
 
-    # 3. Construire un message clair et formaté pour WhatsApp
-    #    On utilise \n pour les sauts de ligne et *...* pour le gras.
     message_for_whatsapp = (
         f"Bonjour Luxury Akran,\n\n"
         f"Je suis intéressé(e) par le produit suivant :\n\n"
@@ -295,20 +288,13 @@ def product_detail(product_id):
         f"{product_image_url}"
     )
 
-    # 4. Encoder le message pour qu'il soit valide dans une URL
     encoded_message = quote(message_for_whatsapp)
-    
-    # 5. Créer le lien WhatsApp final avec le numéro et le message
     whatsapp_link = f"https://wa.me/{current_app.config['WHATSAPP_NUMBER']}?text={encoded_message}"
     
-    # --- FIN DE LA LOGIQUE WHATSAPP ---
-
-    # Logique pour les favoris (si l'utilisateur est connecté)
     favorite_product_ids = []
     if current_user.is_authenticated and not current_user.is_admin:
         favorite_product_ids = [fav.product_id for fav in current_user.favorites]
 
-    # Logique pour les produits recommandés (exemple)
     recommended_products = Product.query.filter(
         Product.category == product.category, 
         Product.id != product.id
@@ -317,12 +303,23 @@ def product_detail(product_id):
     return render_template(
         'product_detail.html',
         product=product,
-        whatsapp_link=whatsapp_link, # On passe le nouveau lien au template
+        whatsapp_link=whatsapp_link,
         favorite_product_ids=favorite_product_ids,
         recommended_products=recommended_products,
         title=f"{product.name} - Luxury Akran"
     )
-    
+
+@app.route('/uploads/<path:filename>')# ajout
+def serve_uploaded_file(filename):
+    """
+    Sert les fichiers depuis le dossier de base des uploads.
+    Ceci est nécessaire car UPLOAD_FOLDER est maintenant en dehors de 'static'.
+    """
+    # On utilise UPLOADS_BASE_PATH qui est '/var/data/uploads' sur Render
+    # ou le dossier 'uploads' localement.
+    base_path = current_app.config['UPLOADS_BASE_PATH']
+    return send_from_directory(base_path, filename)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -609,6 +606,9 @@ def add_product():
 @app.route('/admin/product/<int:product_id>/edit', methods=['GET', 'POST'])
 @admin_required
 def edit_product(product_id):
+    """
+    MODIFIÉ: L'URL de l'image actuelle pointe vers 'serve_uploaded_file'.
+    """
     product = Product.query.get_or_404(product_id)
     form = ProductForm(obj=product)
 
@@ -621,24 +621,17 @@ def edit_product(product_id):
         product.category = form.category.data
         product.gender = form.gender.data
 
-        # --- DÉBUT DE LA LOGIQUE D'UPLOAD CORRIGÉE ---
         image_data = form.image_file.data
         
-        # MODIFIÉ: On vérifie non seulement si `image_data` existe, 
-        # mais aussi si c'est bien un objet fichier qui a un attribut 'filename'.
-        # Cela empêche l'erreur si `image_data` est une simple chaîne de caractères.
         if image_data and hasattr(image_data, 'filename'):
-            
-            # Maintenant, nous savons que c'est un vrai fichier, la vérification est sûre.
             if allowed_file(image_data.filename):
-                # On supprime l'ancienne image si elle existe et n'est pas l'image par défaut
                 if product.image_file and product.image_file != 'default_product.webp':
                     try:
+                        # Le chemin de suppression est correct car il utilise UPLOAD_FOLDER de la config
                         os.remove(os.path.join(app.config['UPLOAD_FOLDER'], product.image_file))
                     except OSError:
-                        pass # Si le fichier n'existe pas, on continue sans erreur
+                        pass
 
-                # Même logique d'optimisation que pour 'add_product'
                 random_hex = secrets.token_hex(8)
                 _, f_ext = os.path.splitext(image_data.filename)
                 filename = random_hex + f_ext
@@ -649,17 +642,16 @@ def edit_product(product_id):
                 i.thumbnail(output_size)
                 i.save(upload_path, optimize=True, quality=85)
                 
-                # On met à jour le nom du fichier dans la base de données
                 product.image_file = filename
             else:
                 flash("Type de fichier image non autorisé. L'image n'a pas été mise à jour.", "warning")
-        # --- FIN DE LA LOGIQUE D'UPLOAD CORRIGÉE ---
 
         db.session.commit()
         flash('Produit mis à jour avec succès!', 'success')
         return redirect(url_for('admin_dashboard'))
-        
-    current_image = url_for('static', filename=f'images/products/{product.image_file}')
+    
+    # MODIFIÉ : Utilise la nouvelle route pour afficher l'image actuelle sur la page d'édition
+    current_image = url_for('serve_uploaded_file', path=f'products/{product.image_file}')
     return render_template('add_product.html', title='Modifier Produit', form=form, legend=f'Modifier: {product.name}', current_image=current_image)
 
 @app.route('/admin/product/<int:product_id>/delete', methods=['POST'])
