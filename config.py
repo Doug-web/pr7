@@ -25,14 +25,15 @@ class Config:
     # Désactive une fonctionnalité de Flask-SQLAlchemy qui n'est plus nécessaire et consomme des ressources
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # --- CONFIGURATION POUR LES UPLOADS D'IMAGES ---
-    # On stocke les images dans un dossier temporaire à l'intérieur du projet.
-    # Rappel : ces images disparaîtront lors des redéploiements sur le plan gratuit.
-    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'images', 'products')
-    
-    # On s'assure que ce dossier existe au démarrage de l'app.
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    UPLOADS_BASE_PATH = os.environ.get('PERSISTENT_DISK_PATH') or os.path.join(BASE_DIR, 'uploads')
 
+    # 2. On définit le dossier spécifique pour les images de produits à l'intérieur de ce chemin de base.
+    #    Ceci est le chemin physique où les fichiers seront sauvegardés.
+    UPLOAD_FOLDER = os.path.join(UPLOADS_BASE_PATH, 'products')
+    
+    # 3. On s'assure que ces dossiers existent au démarrage de l'app.
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+   
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
     # Pour le placeholder de WhatsApp
