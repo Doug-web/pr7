@@ -1,3 +1,5 @@
+
+
 <!-- START OF FILE product_detail.html -->
 
 {% extends "layout.html" %}
@@ -7,7 +9,8 @@
 {% block content %}
 <div class="container page-content product-detail-page">
     <div class="product-image-column">
-        <img src="{{ url_for('static', filename='images/products/' + product.image_file) }}" alt="{{ product.name }}" class="product-main-image" loading="lazy" decoding="async">
+        <!-- MODIFICATION CI-DESSOUS -->
+        <img src="{{ url_for('serve_uploaded_file', path='products/' + product.image_file) }}" alt="{{ product.name }}" class="product-main-image" loading="lazy" decoding="async">
     </div>
     <div class="product-info-column">
         <h1>{{ product.name }}</h1>
