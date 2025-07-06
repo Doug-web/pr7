@@ -1,3 +1,5 @@
+
+
 {% extends "layout.html" %}
 
 {% block title %}Tableau de Bord Admin - Luxury Akran{% endblock %}
@@ -100,7 +102,8 @@
             <tbody>
                 {% for product, order_count in products %}
                 <tr class="product-row">
-                    <td><img src="{{ url_for('static', filename='images/products/' + product.image_file) }}" alt="{{ product.name }}" class="admin-thumb"></td>
+                    <!-- MODIFICATION CI-DESSOUS -->
+                    <td><img src="{{ url_for('serve_uploaded_file', path='products/' + product.image_file) }}" alt="{{ product.name }}" class="admin-thumb"></td>
                     <td class="product-name">{{ product.name }}</td>
                     <td class="product-brand">{{ product.brand or 'N/A' }}</td>
                     <td class="product-category">{{ product.category or 'N/A' }}</td>
