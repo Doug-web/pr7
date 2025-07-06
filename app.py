@@ -265,17 +265,17 @@ def api_filter_options():
 @app.route('/product/<int:product_id>')
 def product_detail(product_id):
     """
-    MODIFIÉ: L'URL de l'image pour le lien WhatsApp pointe vers 'serve_uploaded_file'.
+    Affiche la page de détail d'un produit avec une logique de recommandation avancée.
     """
     product = Product.query.get_or_404(product_id)
     
+    # Incrémente le compteur de vues si l'utilisateur n'est pas un admin
     if not (current_user.is_authenticated and current_user.is_admin):
         product.views = (product.views or 0) + 1
         db.session.commit()
     
+    # --- LOGIQUE DE MISE À JOUR POUR LE LIEN WHATSAPP ---
     product_page_url = url_for('product_detail', product_id=product.id, _external=True)
-
-    # MODIFIÉ : Utilise la nouvelle route pour obtenir l'URL de l'image
     product_image_url = url_for('serve_uploaded_file', path=f'products/{product.image_file}', _external=True)
 
     message_for_whatsapp = (
@@ -287,28 +287,79 @@ def product_detail(product_id):
         f"Voici l'image pour référence :\n"
         f"{product_image_url}"
     )
-
     encoded_message = quote(message_for_whatsapp)
     whatsapp_link = f"https://wa.me/{current_app.config['WHATSAPP_NUMBER']}?text={encoded_message}"
     
+    # --- FIN DE LA LOGIQUE WHATSAPP ---
+
+    # Logique pour les favoris (si l'utilisateur est connecté)
     favorite_product_ids = []
     if current_user.is_authenticated and not current_user.is_admin:
         favorite_product_ids = [fav.product_id for fav in current_user.favorites]
 
-    recommended_products = Product.query.filter(
-        Product.category == product.category, 
-        Product.id != product.id
-    ).limit(4).all()
+    # --- LOGIQUE DE RECOMMANDATION HYBRIDE (AVANCÉE) AVEC PRISE EN COMPTE DU GENRE ---
+    
+    # On définit les genres cibles pour la recommandation.
+    # Un set est utilisé pour éviter les doublons (ex: si le produit est déjà 'Unisexe').
+    target_genders = {'Unisexe'}
+    if product.gender:
+        target_genders.add(product.gender)
 
+    # On stocke les IDs des produits déjà recommandés pour ne pas avoir de doublons
+    recommended_ids = {product.id}
+    recommended_products = []
+
+    # 1. Priorité 1 : Chercher les produits les plus VUS de la MÊME CATÉGORIE et du BON GENRE.
+    recs_by_category = Product.query.filter(
+        Product.category == product.category,
+        Product.gender.in_(target_genders),
+        Product.id != product.id
+    ).order_by(Product.views.desc()).limit(4).all()
+    
+    for p in recs_by_category:
+        if p.id not in recommended_ids:
+            recommended_products.append(p)
+            recommended_ids.add(p.id)
+
+    # 2. Priorité 2 : Si on n'a pas 4 produits, on complète avec les plus VUS de la MÊME MARQUE et du BON GENRE.
+    if len(recommended_products) < 4 and product.brand:
+        needed = 4 - len(recommended_products)
+        recs_by_brand = Product.query.filter(
+            Product.brand == product.brand,
+            Product.gender.in_(target_genders),
+            Product.id.notin_(recommended_ids)
+        ).order_by(Product.views.desc()).limit(needed).all()
+        
+        for p in recs_by_brand:
+            if p.id not in recommended_ids:
+                recommended_products.append(p)
+                recommended_ids.add(p.id)
+
+    # 3. Priorité 3 : S'il en manque encore, on complète avec les plus RÉCENTS de la MÊME CATÉGORIE et du BON GENRE.
+    if len(recommended_products) < 4:
+        needed = 4 - len(recommended_products)
+        recs_by_date = Product.query.filter(
+            Product.category == product.category,
+            Product.gender.in_(target_genders),
+            Product.id.notin_(recommended_ids)
+        ).order_by(Product.added_date.desc()).limit(needed).all()
+        
+        for p in recs_by_date:
+             if p.id not in recommended_ids:
+                recommended_products.append(p)
+                recommended_ids.add(p.id)
+                
+    # --- FIN DE LA LOGIQUE DE RECOMMANDATION ---
+
+    # Rendu final du template avec toutes les données
     return render_template(
         'product_detail.html',
         product=product,
         whatsapp_link=whatsapp_link,
         favorite_product_ids=favorite_product_ids,
-        recommended_products=recommended_products,
+        recommended_products=recommended_products, # On passe notre nouvelle liste de recommandations
         title=f"{product.name} - Luxury Akran"
     )
-
 # --- DANS app.py ---
 
 # --- NOUVELLE ROUTE POUR SERVIR LES IMAGES DEPUIS LE DISQUE PERSISTANT (CORRIGÉE) ---
