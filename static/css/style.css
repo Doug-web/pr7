@@ -1,5 +1,3 @@
-
-
 /* --- START OF FILE style.css (VERSION FINALE CORRIGÉE ET RESPONSIVE) --- */
 
 /* --- STYLES GÉNÉRAUX --- */
@@ -239,22 +237,25 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
     min-height: 0;
 }
 
+/* L'image remplit maintenant complètement son conteneur. */
 .product-image-wrapper img {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain; 
-    transform: none; 
+    /* MODIFIÉ: 'cover' garantit que l'image remplit tout l'espace, 
+       quitte à être rognée si les proportions diffèrent. */
+    object-fit: cover; 
+    /* On réactive la transition pour un effet de zoom fluide. */
     transition: transform 0.3s ease;
 }
 
+/* On peut maintenant réactiver l'effet de zoom au survol pour un rendu plus dynamique. */
 .product-card:hover .product-image-wrapper img {
-    transform: none;
+    /* Un léger zoom est appliqué au survol. */
+    transform: scale(1.05);
 }
-
-/* ========== DÉBUT DE LA MODIFICATION ========== */
 
 .product-card h3 {
     /* MODIFIÉ: Réduction de la taille de la police */
@@ -274,7 +275,6 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
     color: #777;
     margin: 0 0 5px 0;
 }
-/* La classe .price a été retirée du HTML, mais on la laisse au cas où. */
 .product-card .price {
     font-size: 1.1em;
     font-weight: bold;
@@ -296,9 +296,6 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
     /* MODIFIÉ: Réduction de la taille de la police */
     font-size: 0.8em; 
 }
-
-/* ========== FIN DE LA MODIFICATION ========== */
-
 .product-card-actions .btn-details {
     flex-grow: 1;
 }
@@ -306,8 +303,6 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
     font-size: 1.1em;
     margin-right: 0;
 }
-
-/* --- LE RESTE DU CSS RESTE INCHANGÉ --- */
 
 /* --- PAGE DÉTAIL PRODUIT --- */
 .product-detail-page {
