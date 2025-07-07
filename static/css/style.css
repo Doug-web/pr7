@@ -260,7 +260,7 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
 .product-card h3 {
     /* MODIFIÉ: Réduction de la taille de la police */
     font-size: 1.0em; 
-    color: #333;
+    color: #5e2ced;
     margin: 10px 0 5px 0;
     flex-shrink: 0;
     text-align: center;
