@@ -248,10 +248,9 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
 .product-card:hover .product-image-wrapper img {
     transform: scale(1.05);
 }
-
 .product-card h3 {
     font-size: 1.0em; 
-    color: #5e2ced; /* MODIFIÉ : La couleur est maintenant le violet du thème */
+    color: #5e2ced; /* MODIFIÉ : Couleur violette du thème */
     margin: 10px 0 5px 0;
     flex-shrink: 0;
     text-align: center;
@@ -558,20 +557,25 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
     border-radius: 8px;
     align-items: flex-end;
 }
+/* MODIFIÉ : Disposition des filtres */
 .filter-group {
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Met le label et le champ sur la même ligne */
+    align-items: center; /* Centre verticalement les éléments */
+    gap: 10px;           /* Espace entre le label et le champ */
 }
 .filter-group label {
     font-size: 0.9em;
-    margin-bottom: 5px;
+    margin-bottom: 0; /* Enlevé car alignement géré par flex */
     color: #555;
+    flex-shrink: 0; /* Empêche le label de se compresser */
 }
 .filter-group select, .filter-group input[type="text"] {
     padding: 8px 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     min-width: 180px;
+    flex-grow: 1; /* Permet au champ de s'étirer */
 }
 .btn-filter {
     padding: 8px 15px;
@@ -856,15 +860,36 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
 }
 
 @media (max-width: 768px) {
+    /* AJOUTÉ : Styles pour rendre le site plus compact sur mobile */
+    body {
+        font-size: 15px; /* Réduit la police de base pour une meilleure densité */
+        -webkit-text-size-adjust: 100%; /* Empêche le zoom auto sur iOS */
+    }
+    .btn {
+        padding: 8px 16px; /* Boutons légèrement plus petits */
+        font-size: 0.9em;
+    }
+    .product-detail-page {
+        gap: 20px; /* Réduit l'espace entre l'image et les infos */
+    }
+
+    /* Styles originaux conservés et modifiés */
     .hero h1 { font-size: 2em; }
     .hero p { font-size: 1em; }
+    
+    /* MODIFIÉ : Adaptation des filtres pour mobile */
     .filters-form {
         flex-direction: column;
         align-items: stretch;
     }
-    .filter-group select, .filter-group input[type="text"], .btn-filter {
+    /* La disposition en ligne (row) du filter-group s'applique toujours, ce qui est parfait. */
+    .filter-group select, .filter-group input[type="text"] {
+        width: auto; /* La largeur est maintenant gérée par flex-grow */
+    }
+    .btn-filter {
         width: 100%;
     }
+
     .contact-methods {
         flex-direction: column;
     }
@@ -908,42 +933,5 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
         margin-right: 15px;
         font-size: 1.8em;
         flex-shrink: 0;
-    }
-
-    /* --- AJOUTS POUR L'OPTIMISATION MOBILE (TAILLE) --- */
-    .products-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-    .product-card {
-        padding: 10px;
-    }
-    .product-card h3 {
-        font-size: 0.9em;
-        margin: 8px 0 4px 0;
-    }
-    .product-card .brand {
-        font-size: 0.75em;
-    }
-    .product-card .price {
-        font-size: 1em;
-    }
-    .product-card-actions {
-        padding-top: 8px;
-        gap: 5px;
-    }
-    .product-card-actions .btn {
-        padding: 5px 8px;
-        font-size: 0.75em;
-    }
-    .product-card-actions .btn i {
-        font-size: 1em;
-    }
-    .btn {
-        padding: 8px 16px;
-        font-size: 0.9em;
-    }
-    h1 {
-        font-size: 1.8em;
     }
 }
