@@ -6,15 +6,14 @@
     <a href="{{ url_for('product_detail', product_id=product.id) }}">
         <!-- NOUVEAU : Un conteneur pour l'image -->
         <div class="product-image-wrapper">
-            <!-- MODIFICATION CI-DESSOUS -->
-            <img src="{{ url_for('serve_uploaded_file', path='products/' + product.image_file) }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+            <img src="{{ url_for('static', filename='images/products/' + product.image_file) }}" alt="{{ product.name }}" loading="lazy" decoding="async">
         </div>
         <h3>{{ product.name }}</h3>
     </a>
 
-    <div class="product-card-info"> <!-- NOUVEAU : Un conteneur pour les infos -->
+    <!-- MODIFIÉ : La ligne du prix a été retirée -->
+    <div class="product-card-info">
         <p class="brand">Marque : {{ product.brand or 'N/A' }}</p>
-        <p class="price">{{ product.price_info }}</p>
     </div>
     
     <div class="product-card-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 5px;">
