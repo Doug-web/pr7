@@ -1,230 +1,188 @@
+
+
 /* --- START OF FILE style.css (VERSION FINALE CORRIGÉE ET RESPONSIVE) --- */
 
 /* --- STYLES GÉNÉRAUX --- */
-
-/* Définit les styles de base pour l'ensemble du document */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Police de caractères moderne et lisible */
-    margin: 0; /* Supprime la marge par défaut du navigateur */
-    padding: 0; /* Supprime le remplissage par défaut du navigateur */
-    background-color: #f8f9fa; /* Couleur de fond gris très clair pour un look doux */
-    color: #333; /* Couleur de texte par défaut, un gris foncé pour un bon contraste */
-    line-height: 1.6; /* Hauteur de ligne pour une meilleure lisibilité des paragraphes */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
 }
-
-/* Conteneur principal pour centrer le contenu de la page */
 .container {
-    width: 90%; /* Le conteneur prend 90% de la largeur de la fenêtre */
-    max-width: 1200px; /* Mais ne dépasse jamais 1200px pour éviter un étirement excessif sur les grands écrans */
-    margin: 0 auto; /* Centre horizontalement le conteneur */
-    padding: 0 15px; /* Ajoute un peu d'espace sur les côtés pour que le contenu ne colle pas aux bords */
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
 }
-
-/* Style de base pour tous les liens hypertextes */
 a {
-    color: #5e2ced; /* Couleur violette distinctive pour les liens */
-    text-decoration: none; /* Supprime le soulignement par défaut des liens */
+    color: #5e2ced;
+    text-decoration: none;
 }
-/* Style des liens au survol de la souris */
 a:hover {
-    text-decoration: underline; /* Ajoute un soulignement au survol pour un retour visuel clair */
+    text-decoration: underline;
 }
-
-/* Assure que les images ne dépassent jamais leur conteneur parent */
 img {
-    max-width: 100%; /* La largeur maximale est de 100% de la largeur du conteneur */
-    height: auto; /* La hauteur s'ajuste automatiquement pour conserver les proportions */
+    max-width: 100%;
+    height: auto;
 }
-
 
 /* --- EN-TÊTE (HEADER) --- */
-
-/* Style de la barre de navigation principale */
 header {
-    background-color: #fff; /* Fond blanc pour se détacher du corps de la page */
-    padding: 15px 0; /* Espace vertical à l'intérieur de l'en-tête */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Ombre portée subtile pour donner de la profondeur */
-    position: sticky; /* L'en-tête reste collé en haut de l'écran lors du défilement */
-    top: 0; /* Se colle tout en haut */
-    z-index: 1000; /* Assure que l'en-tête reste au-dessus des autres éléments de la page */
+    background-color: #fff;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
-
-/* Conteneur flex pour aligner les éléments de l'en-tête */
 .nav-container {
-    display: flex; /* Active le modèle de boîte flexible (Flexbox) */
-    justify-content: space-between; /* Espace les éléments (logo, nav, actions) de manière égale */
-    align-items: center; /* Aligne verticalement les éléments au centre */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-
-/* Style du logo */
 .logo {
-    font-size: 1.8em; /* Taille de police plus grande */
-    font-weight: bold; /* Texte en gras */
-    color: #5e2ced; /* Couleur violette de la marque */
-    text-transform: uppercase; /* Met le texte en majuscules */
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #5e2ced;
+    text-transform: uppercase;
 }
-.logo:hover { text-decoration: none; } /* Empêche le soulignement au survol pour le logo */
-
-/* Style de la liste de navigation */
+.logo:hover { text-decoration: none; }
 header nav ul {
-    list-style: none; /* Supprime les puces de la liste */
-    padding: 0; /* Supprime le remplissage par défaut */
-    margin: 0; /* Supprime la marge par défaut */
-    display: flex; /* Aligne les éléments de la liste horizontalement */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
 }
-
-/* Style des éléments de la liste de navigation */
 header nav ul li {
-    margin-left: 25px; /* Ajoute un espace à gauche de chaque élément pour les séparer */
+    margin-left: 25px;
 }
-
-/* Style des liens dans la navigation */
 header nav ul li a {
-    color: #333; /* Couleur de texte sobre */
-    font-weight: 500; /* Police légèrement plus épaisse que la normale */
-    font-size: 1em; /* Taille de police standard */
-    transition: color 0.3s ease; /* Animation de transition douce pour le changement de couleur */
+    color: #333;
+    font-weight: 500;
+    font-size: 1em;
+    transition: color 0.3s ease;
 }
-/* Style pour le lien actif ou au survol */
 header nav ul li a.active, header nav ul li a:hover {
-    color: #5e2ced; /* Change la couleur en violet pour indiquer la sélection/le survol */
+    color: #5e2ced;
 }
-
-/* Conteneur pour les actions de l'en-tête (recherche, boutons) */
 .header-actions {
-    display: flex; /* Utilise Flexbox pour aligner les éléments */
-    align-items: center; /* Centre verticalement les éléments */
-    gap: 10px; /* Crée un espace de 10px entre chaque élément */
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
-
-/* Style du formulaire de recherche */
 .search-form {
-    display: flex; /* Aligne le champ de saisie et le bouton sur la même ligne */
+    display: flex;
 }
 .search-form input[type="search"] {
-    padding: 8px 12px; /* Espace intérieur */
-    border: 1px solid #ddd; /* Bordure grise claire */
-    border-radius: 20px 0 0 20px; /* Coins arrondis uniquement à gauche pour un effet "pilule" */
-    font-size: 0.9em; /* Police légèrement plus petite */
-    outline: none; /* Supprime le contour bleu lors du focus */
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px 0 0 20px;
+    font-size: 0.9em;
+    outline: none;
 }
 .search-form button {
     padding: 8px 12px;
-    background-color: #5e2ced; /* Fond violet */
-    color: white; /* Texte blanc */
-    border: none; /* Aucune bordure */
-    border-radius: 0 20px 20px 0; /* Coins arrondis uniquement à droite */
-    cursor: pointer; /* Curseur en forme de main */
-    transition: background-color 0.3s ease; /* Transition douce pour la couleur de fond */
+    background-color: #5e2ced;
+    color: white;
+    border: none;
+    border-radius: 0 20px 20px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 .search-form button:hover {
-    background-color: #4a23b3; /* Violet plus foncé au survol */
+    background-color: #4a23b3;
 }
-
-/* Style des boutons de navigation (ex: Se connecter) */
 .nav-button {
     padding: 8px 15px;
     background-color: #5e2ced;
     color: white;
-    border-radius: 20px; /* Coins entièrement arrondis */
+    border-radius: 20px;
     font-size: 0.9em;
     transition: background-color 0.3s ease;
-    display: inline-flex; /* Permet d'aligner du texte et une icône à l'intérieur */
+    display: inline-flex;
     align-items: center;
 }
 .nav-button:hover {
     background-color: #4a23b3;
     color: white;
-    text-decoration: none; /* Pas de soulignement au survol */
+    text-decoration: none;
 }
-/* Style pour le nom de l'utilisateur connecté */
 .nav-user {
     font-size: 0.9em;
     color: #555;
 }
-/* Style spécifique pour le lien vers le panneau d'administration */
-.admin-link { background-color: #ffc107; color: #333; } /* Fond jaune pour se démarquer */
-.admin-link:hover { background-color: #e0a800; } /* Jaune plus foncé au survol */
-
-/* Ajoute un espace entre l'icône et le texte dans le bouton "Mes Favoris" */
+.admin-link { background-color: #ffc107; color: #333; }
+.admin-link:hover { background-color: #e0a800; }
 .header-actions .nav-button[title="Mes Favoris"] i {
     margin-right: 5px;
 }
 
-
 /* --- PIED DE PAGE (FOOTER) --- */
 footer {
-    background-color: #343a40; /* Fond gris foncé pour un contraste net avec le contenu */
-    color: #f8f9fa; /* Texte clair pour la lisibilité sur fond foncé */
-    padding: 40px 0; /* Espace vertical généreux */
-    text-align: center; /* Centre le contenu */
-    font-size: 0.9em; /* Police légèrement plus petite */
+    background-color: #343a40;
+    color: #f8f9fa;
+    padding: 40px 0;
+    text-align: center;
+    font-size: 0.9em;
 }
 footer p {
-    margin-bottom: 10px; /* Espace sous les paragraphes */
+    margin-bottom: 10px;
 }
 footer a {
-    color: #adb5bd; /* Liens gris clair pour une intégration douce */
+    color: #adb5bd;
 }
 footer a:hover {
-    color: #fff; /* Liens blancs au survol pour un meilleur retour visuel */
+    color: #fff;
 }
-
 
 /* --- ALERTES / MESSAGES FLASH --- */
-/* Style de base pour les boîtes d'alerte */
 .alert {
-    padding: 15px; /* Espace intérieur */
-    margin-bottom: 20px; /* Marge en bas pour espacer du contenu suivant */
-    border: 1px solid transparent; /* Bordure par défaut */
-    border-radius: 4px; /* Coins légèrement arrondis */
-    text-align: center; /* Centre le texte */
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    text-align: center;
 }
-/* Styles pour les différents types d'alertes (succès, erreur, etc.) */
 .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
 .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
 .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
 .alert-info { color: #0c5460; background-color: #d1ecf1; border-color: #bee5eb; }
 
-
 /* --- CONTENU PRINCIPAL ET SECTIONS --- */
 main {
-    padding-top: 20px; /* Espace sous l'en-tête */
-    padding-bottom: 40px; /* Espace au-dessus du pied de page */
-    min-height: calc(100vh - 120px - 140px); /* Calcule la hauteur minimale pour que le footer reste en bas, même sur les pages avec peu de contenu. (100vh = hauteur totale de l'écran, 120px et 140px sont des estimations des hauteurs de l'header et du footer) */
+    padding-top: 20px;
+    padding-bottom: 40px;
+    min-height: calc(100vh - 120px - 140px);
 }
-
-/* Conteneur blanc pour le contenu principal de la page */
 .page-content {
-    background-color: #fff; /* Fond blanc */
-    padding: 25px; /* Espace intérieur confortable */
-    border-radius: 8px; /* Coins arrondis */
-    box-shadow: 0 0 15px rgba(0,0,0,0.05); /* Ombre très subtile */
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
 }
-
-/* Styles pour les titres */
 h1, h2, h3 {
-    color: #333; /* Couleur sombre par défaut */
-    margin-top: 0; /* Supprime la marge supérieure pour un meilleur contrôle */
+    color: #333;
+    margin-top: 0;
 }
-h1 { font-size: 2.2em; margin-bottom: 20px; color: #5e2ced; } /* Titre principal, grand et en violet */
-h2 { font-size: 1.8em; margin-bottom: 15px; color: #4a23b3; border-bottom: 2px solid #eee; padding-bottom: 10px; } /* Titre de section, avec une ligne de séparation en dessous */
-h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
-
+h1 { font-size: 2.2em; margin-bottom: 20px; color: #5e2ced; }
+h2 { font-size: 1.8em; margin-bottom: 15px; color: #4a23b3; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+h3 { font-size: 1.4em; margin-bottom: 10px; }
 
 /* --- BOUTONS GÉNÉRAUX --- */
 .btn {
-    display: inline-block; /* Se comporte comme un bloc mais s'insère dans le flux du texte */
-    padding: 10px 20px; /* Espace intérieur */
-    font-size: 1em; /* Taille de police standard */
-    font-weight: 500; /* Police semi-épaisse */
-    text-align: center; /* Centre le texte */
-    border-radius: 25px; /* Coins très arrondis pour un look "pilule" */
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: 500;
+    text-align: center;
+    border-radius: 25px;
     cursor: pointer;
-    transition: all 0.3s ease; /* Transition douce pour toutes les propriétés animables */
-    border: none; /* Pas de bordure par défaut */
+    transition: all 0.3s ease;
+    border: none;
 }
-/* Variations de couleur pour les boutons */
 .btn-primary { background-color: #5e2ced; color: white; }
 .btn-primary:hover { background-color: #4a23b3; color: white; text-decoration: none; }
 .btn-secondary { background-color: #6c757d; color: white; }
@@ -233,145 +191,131 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 .btn-details:hover { background-color: #e0e0e0; }
 .btn-whatsapp { background-color: #25D366; color: white; }
 .btn-whatsapp:hover { background-color: #1DA851; color: white; text-decoration: none; }
-/* Espace entre l'icône et le texte dans un bouton */
 .btn i { margin-right: 8px; }
-
-/* Bouton "outline" pour les actions de suppression/danger */
 .btn-outline-danger {
-    color: #dc3545; /* Texte rouge (couleur danger) */
-    background-color: transparent; /* Fond transparent */
-    border: 1px solid #dc3545; /* Bordure rouge */
+    color: #dc3545;
+    background-color: transparent;
+    border: 1px solid #dc3545;
 }
 .btn-outline-danger:hover {
-    color: #fff; /* Texte devient blanc au survol */
-    background-color: #dc3545; /* Le fond devient rouge */
+    color: #fff;
+    background-color: #dc3545;
     border-color: #dc3545;
     text-decoration: none;
 }
 
-
 /* --- GRILLE DE PRODUITS --- */
 .products-grid {
-    display: grid; /* Active le modèle de grille (CSS Grid) */
-    /* Crée des colonnes qui s'adaptent automatiquement. Chaque colonne fait au minimum 280px.
-       S'il y a de la place, elles s'élargissent pour remplir l'espace (1fr). */
+    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px; /* Espace de 25px entre chaque carte de la grille */
-    margin-top: 20px; /* Espace au-dessus de la grille */
+    gap: 25px;
+    margin-top: 20px;
 }
-
 
 /* --- STYLES POUR LA CARTE PRODUIT (PRODUCT CARD) --- */
 .product-card {
     background-color: #fff;
-    border: 1px solid #e0e0e0; /* Bordure subtile */
-    border-radius: 8px; /* Coins arrondis */
-    padding: 15px; /* Espace intérieur */
-    transition: box-shadow 0.3s ease; /* Animation de l'ombre au survol */
-    /* Configuration Flexbox pour organiser le contenu verticalement */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    transition: box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
-    /* Force la carte à avoir un ratio hauteur/largeur de 1:1, la rendant carrée */
     aspect-ratio: 1 / 1; 
 }
-
 .product-card:hover {
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Ombre plus prononcée au survol */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
-
-/* Astuce pour que le lien (<a>) n'interfère pas avec le layout Flexbox */
 .product-card > a {
     text-decoration: none;
-    color: inherit; /* Le lien hérite de la couleur de son parent */
-    /* Permet aux enfants du lien (image, titre, etc.) de se comporter comme des enfants directs du conteneur Flexbox (.product-card) */
+    color: inherit;
     display: contents; 
 }
-
-/* Le conteneur de l'image est la partie qui va s'étirer pour remplir l'espace */
 .product-image-wrapper {
-    position: relative; /* Nécessaire pour le positionnement absolu de l'image à l'intérieur */
-    overflow: hidden; /* Cache les parties de l'image qui pourraient déborder */
+    position: relative;
+    overflow: hidden;
     border-radius: 4px;
-    flex-grow: 1; /* C'EST LA CLÉ : Ce bloc prend toute la place verticale disponible dans la carte */
-    min-height: 0; /* Astuce Flexbox pour éviter des problèmes de dimensionnement */
+    flex-grow: 1;
+    min-height: 0;
 }
 
-/* L'image remplit complètement son conteneur sans se déformer */
 .product-image-wrapper img {
-    position: absolute; /* Se positionne par rapport au .product-image-wrapper */
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100%; /* Remplit toute la largeur du conteneur */
-    height: 100%; /* Remplit toute la hauteur du conteneur */
-    object-fit: cover; /* L'image couvre la zone, en étant rognée si nécessaire pour garder ses proportions */
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+    transform: none; 
+    transition: transform 0.3s ease;
 }
 
-/* Le titre du produit a une hauteur fixe et ne se comprime pas */
+.product-card:hover .product-image-wrapper img {
+    transform: none;
+}
+
+/* ========== DÉBUT DE LA MODIFICATION ========== */
+
 .product-card h3 {
-    font-size: 1.1em;
+    /* MODIFIÉ: Réduction de la taille de la police */
+    font-size: 1.0em; 
     color: #333;
-    margin: 10px 0 5px 0; /* Espace autour du titre */
-    flex-shrink: 0; /* Empêche le titre de rétrécir si l'espace manque */
+    margin: 10px 0 5px 0;
+    flex-shrink: 0;
     text-align: center;
 }
-
-/* Conteneur pour les informations (marque, prix) */
 .product-card-info {
     text-align: center;
-    flex-shrink: 0; /* Ne se comprime pas */
+    flex-shrink: 0;
 }
-
 .product-card .brand {
-    font-size: 0.9em;
+    /* MODIFIÉ: Réduction de la taille de la police */
+    font-size: 0.85em; 
     color: #777;
     margin: 0 0 5px 0;
 }
-
+/* La classe .price a été retirée du HTML, mais on la laisse au cas où. */
 .product-card .price {
     font-size: 1.1em;
     font-weight: bold;
     color: #5e2ced;
     margin: 0;
 }
-
-/* Les boutons d'action sont poussés vers le bas de la carte */
 .product-card-actions {
     display: flex;
-    justify-content: space-between; /* Espace les boutons */
+    justify-content: space-between;
     align-items: center;
-    margin-top: auto; /* Pousse ce bloc tout en bas de la carte Flexbox */
-    padding-top: 10px; /* Espace au-dessus des boutons */
-    flex-shrink: 0; /* Ne se comprime pas */
-    gap: 5px; /* Petit espace entre les boutons */
+    margin-top: auto;
+    padding-top: 10px;
+    flex-shrink: 0;
+    gap: 5px;
 }
-
-/* Styles pour les boutons à l'intérieur de la carte */
 .product-card-actions .btn {
-    flex-grow: 0; /* Les boutons ne grandissent pas pour remplir l'espace */
-    padding: 6px 8px; /* Boutons plus petits */
-    font-size: 0.85em;
+    flex-grow: 0;
+    padding: 6px 8px;
+    /* MODIFIÉ: Réduction de la taille de la police */
+    font-size: 0.8em; 
 }
 
-/* Le bouton "Détails" peut prendre plus de place si nécessaire */
+/* ========== FIN DE LA MODIFICATION ========== */
+
 .product-card-actions .btn-details {
     flex-grow: 1;
 }
-
-/* Les icônes dans les boutons n'ont pas de marge à droite */
 .product-card-actions .btn i {
     font-size: 1.1em;
     margin-right: 0;
 }
 
+/* --- LE RESTE DU CSS RESTE INCHANGÉ --- */
 
 /* --- PAGE DÉTAIL PRODUIT --- */
-/* Layout en deux colonnes pour la page de détail */
 .product-detail-page {
     display: flex;
-    gap: 30px; /* Espace entre la colonne image et la colonne informations */
+    gap: 30px;
 }
 .product-image-column {
-    flex: 1; /* Prend une part de l'espace disponible */
+    flex: 1;
 }
 .product-main-image {
     width: 100%;
@@ -379,19 +323,17 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .product-info-column {
-    flex: 1.5; /* Prend 1.5 fois plus de place que la colonne image */
+    flex: 1.5;
 }
-/* Styles pour les informations du produit */
 .product-info-column .brand { font-size: 1.1em; color: #555; margin-bottom: 10px; }
 .product-info-column .price-info { font-size: 1.5em; font-weight: bold; color: #5e2ced; margin-bottom: 20px; }
 .product-info-column .description { margin-bottom: 20px; }
 .product-info-column .tags { margin-bottom: 25px; }
-/* Style pour les "tags" (étiquettes) */
 .product-info-column .tag {
     background-color: #eee;
     color: #555;
     padding: 5px 10px;
-    border-radius: 15px; /* Effet pilule */
+    border-radius: 15px;
     font-size: 0.9em;
     margin-right: 5px;
     display: inline-block;
@@ -401,10 +343,9 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 
 
 /* --- FORMULAIRES (Authentification, Admin) --- */
-/* Conteneur pour les formulaires de connexion/inscription */
 .auth-form-container {
-    max-width: 500px; /* Largeur maximale pour une bonne lisibilité */
-    margin: 40px auto; /* Centré horizontalement avec de l'espace vertical */
+    max-width: 500px;
+    margin: 40px auto;
     padding: 30px;
     background-color: #fff;
     border-radius: 8px;
@@ -415,42 +356,36 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     margin-bottom: 25px;
     color: #5e2ced;
 }
-/* Groupe de formulaire (label + input) */
 .form-group {
     margin-bottom: 20px;
 }
 .form-label {
-    display: block; /* Le label prend toute la largeur */
-    margin-bottom: 5px; /* Espace entre le label et le champ */
+    display: block;
+    margin-bottom: 5px;
     font-weight: 500;
     color: #495057;
 }
-/* Champ de formulaire standard */
 .form-control {
-    width: 100%; /* Prend toute la largeur de son conteneur */
+    width: 100%;
     padding: 10px 12px;
     font-size: 1em;
     border: 1px solid #ced4da;
     border-radius: 4px;
-    box-sizing: border-box; /* Le padding et la bordure sont inclus dans la largeur totale */
+    box-sizing: border-box;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
-/* Style du champ lorsqu'il est sélectionné (focus) */
 .form-control:focus {
-    border-color: #8b70dd; /* La bordure change de couleur */
-    outline: 0; /* Supprime l'outline par défaut */
-    /* Ajoute une ombre douce pour un effet "glow" */
+    border-color: #8b70dd;
+    outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(94, 44, 237, 0.25);
 }
-/* Styles pour les champs de type "fichier" */
 .form-control-file {
     display: block; 
     padding: 10px; 
 }
-.form-check-input { margin-right: 5px; } /* Espace à droite de la case à cocher */
-/* Style pour les messages d'erreur de formulaire */
+.form-check-input { margin-right: 5px; }
 .errors span {
-    color: #dc3545; /* Couleur rouge pour les erreurs */
+    color: #dc3545;
     font-size: 0.875em;
     display: block;
     margin-top: 5px;
@@ -459,29 +394,26 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 /* --- TABLEAU DE BORD ADMIN --- */
 .admin-dashboard table {
     width: 100%;
-    border-collapse: collapse; /* Fusionne les bordures des cellules */
+    border-collapse: collapse;
     margin-top: 20px;
 }
 .admin-dashboard th, .admin-dashboard td {
     border: 1px solid #ddd;
     padding: 10px;
     text-align: left;
-    vertical-align: middle; /* Aligne le contenu des cellules au milieu verticalement */
+    vertical-align: middle;
 }
 .admin-dashboard th {
-    background-color: #f2f2f2; /* Fond gris clair pour les en-têtes de tableau */
+    background-color: #f2f2f2;
     font-weight: bold;
 }
-/* Style pour les miniatures d'images dans le tableau */
 .admin-thumb {
     width: 60px;
     height: 60px;
-    object-fit: cover; /* L'image remplit l'espace sans se déformer */
+    object-fit: cover;
     border-radius: 4px;
 }
-/* Boutons plus petits pour les actions dans le tableau */
 .btn-sm { padding: 5px 10px; font-size: 0.8em; }
-/* Variations de couleurs pour les boutons d'action admin */
 .btn-warning { background-color: #ffc107; color: #212529; }
 .btn-warning:hover { background-color: #e0a800; }
 .btn-danger { background-color: #dc3545; color: white; }
@@ -490,15 +422,12 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 .btn-success:hover { background-color: #218838; }
 .btn-info { background-color: #17a2b8; color: white; }
 .btn-info:hover { background-color: #138496; }
-
 .admin-actions { margin-bottom: 30px; }
 .download-buttons { margin-top: 15px; }
 .download-buttons .btn { margin-right: 10px; margin-bottom: 10px; }
-
-/* Section des statistiques admin */
 .admin-stats .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Grille responsive */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-bottom: 20px;
 }
@@ -515,31 +444,26 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 
 
 /* --- SECTIONS DE LA PAGE D'ACCUEIL --- */
-/* Section "Héros" (grande bannière d'accueil) */
 .hero {
-    background-size: cover; /* L'image de fond couvre toute la section */
-    background-position: center; /* Centre l'image de fond */
-    color: white; /* Texte blanc pour contraster avec l'image */
-    padding: 100px 0; /* Grand espace vertical */
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 100px 0;
     text-align: center;
-    position: relative; /* Nécessaire pour le pseudo-élément ::before */
+    position: relative;
 }
-/* Superposition sombre pour améliorer la lisibilité du texte sur l'image */
 .hero::before { 
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0,0,0,0.5); /* Noir avec 50% de transparence */
+    background-color: rgba(0,0,0,0.5);
 }
-/* Le contenu du héros doit être au-dessus de la superposition */
 .hero-content {
     position: relative; 
     z-index: 1;
 }
 .hero h1 { font-size: 3em; margin-bottom: 20px; color: white; }
 .hero p { font-size: 1.2em; margin-bottom: 30px; }
-
-/* Bannière de service (ex: "Livraison rapide") */
 .service-banner {
     background-color: #5e2ced;
     color: white;
@@ -547,12 +471,10 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     text-align: center;
 }
 .service-banner p { margin: 0; font-size: 1.1em; }
-
-/* Section "Livraison Mondiale" */
 .global-delivery {
     padding: 40px 0;
     text-align: center;
-    background-color: #f0eaff; /* Violet très clair */
+    background-color: #f0eaff;
 }
 .global-delivery h2 { color: #5e2ced; }
 .global-delivery .country-flags span {
@@ -562,36 +484,32 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     color: #4a23b3;
 }
 .global-delivery .fa-globe { font-size: 1.8em; color: #4a23b3; }
-
-/* Section "Catégories Populaires" */
 .popular-categories { padding: 40px 0; }
 .categories-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Grille responsive */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
 .category-card {
     border: 1px solid #ddd;
     border-radius: 8px;
-    overflow: hidden; /* Cache ce qui dépasse */
+    overflow: hidden;
     text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Double transition au survol */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .category-card:hover {
-    transform: translateY(-5px); /* Se soulève légèrement */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Ombre plus prononcée */
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     text-decoration: none;
 }
-/* Style pour les icônes dans les cartes de catégories */
 .category-card .category-icon {
     padding: 20px;
-    font-size: 2.5em; /* Grande icône */
+    font-size: 2.5em;
     color: #5e2ced;
-    background-color: #f0eaff; /* Fond violet clair */
+    background-color: #f0eaff;
     border-bottom: 1px solid #ddd;
 }
-/* Style pour une image si elle est utilisée à la place d'une icône */
 .category-card img {
     width: 100%;
     height: 200px;
@@ -604,12 +522,10 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     color: #333;
     font-size: 1.2em;
 }
-
-/* Section "Comment Acheter" */
 .how-to-buy { padding: 40px 0; background-color: #fff; }
 .how-to-buy .steps {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Grille responsive */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
@@ -625,8 +541,6 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     margin-bottom: 10px;
     display: block;
 }
-
-/* Section "Produits Mis en Avant" */
 .featured-products { padding: 40px 0; }
 
 
@@ -641,11 +555,8 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     border-radius: 4px;
     transition: background-color 0.3s, color 0.3s;
 }
-/* Style du lien de la page active */
 .page-item.active .page-link { background-color: #5e2ced; color: white; border-color: #5e2ced; }
-/* Style du lien désactivé (ex: "précédent" sur la première page) */
 .page-item.disabled .page-link { color: #aaa; background-color: #f5f5f5; cursor: not-allowed; }
-/* Style au survol pour les liens non actifs/désactivés */
 .page-link:hover:not(.page-item.active .page-link):not(.page-item.disabled .page-link) {
     background-color: #f0eaff;
     text-decoration: none;
@@ -654,18 +565,18 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 
 /* --- FILTRES SUR LA PAGE PRODUITS --- */
 .filters-form {
-    display: flex; /* Aligne les groupes de filtres horizontalement */
-    flex-wrap: wrap; /* Permet aux filtres de passer à la ligne sur les petits écrans */
-    gap: 15px; /* Espace entre les groupes de filtres */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
     margin-bottom: 30px;
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
-    align-items: flex-end; /* Aligne les éléments (y compris le bouton) sur la ligne de base */
+    align-items: flex-end;
 }
 .filter-group {
     display: flex;
-    flex-direction: column; /* Label au-dessus du champ */
+    flex-direction: column;
 }
 .filter-group label {
     font-size: 0.9em;
@@ -676,7 +587,7 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     padding: 8px 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    min-width: 180px; /* Largeur minimale pour les champs de filtre */
+    min-width: 180px;
 }
 .btn-filter {
     padding: 8px 15px;
@@ -685,7 +596,7 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    align-self: flex-end; /* S'assure que le bouton reste aligné en bas même s'il n'a pas de label */
+    align-self: flex-end;
 }
 .btn-filter:hover { background-color: #4a23b3; }
 
@@ -698,7 +609,7 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     margin-bottom: 30px;
 }
 .contact-method {
-    flex: 1; /* Chaque méthode prend une part égale de l'espace */
+    flex: 1;
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
@@ -713,7 +624,6 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 
 
 /* --- GRILLE DES PRODUITS RECOMMANDÉS (plus spécifique) --- */
-/* S'assure que la grille dans cette section a les bons styles, même si une règle plus générale existait. */
 .related-products .products-grid {
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -725,29 +635,26 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 .admin-dashboard .admin-product-search-form-container {
     margin-bottom: 20px;
 }
-/* Conteneur qui groupe le champ de recherche et le bouton */
 .admin-dashboard .search-with-button-wrapper {
     display: flex;        
-    align-items: stretch; /* Les éléments s'étirent pour avoir la même hauteur */
+    align-items: stretch;
     width: 100%;
     border: 1px solid #ced4da; 
     border-radius: 6px;       
-    overflow: hidden; /* Cache les coins internes pour un aspect unifié */
+    overflow: hidden;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
-/* Le champ de saisie lui-même */
 .admin-dashboard .search-with-button-wrapper .admin-search-input-field.form-control {
-    flex-grow: 1; /* Le champ prend tout l'espace disponible */
-    border: none; /* La bordure est sur le conteneur parent */
+    flex-grow: 1;
+    border: none;
     border-radius: 0;           
     padding-left: 12px !important; 
     padding-right: 12px;
-    box-shadow: none !important; /* Pas d'ombre portée, gérée par le parent */
+    box-shadow: none !important;
     outline: none;              
     background-color: transparent;
     color: #495057;
 }
-/* Le bouton de recherche */
 .admin-dashboard .search-with-button-wrapper .btn-search-admin {
     background-color: #5e2ced; 
     color: white;
@@ -761,7 +668,7 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s ease;
-    white-space: nowrap; /* Empêche le texte du bouton de passer à la ligne */
+    white-space: nowrap;
 }
 .admin-dashboard .search-with-button-wrapper .btn-search-admin:hover {
     background-color: #4a23b3; 
@@ -770,7 +677,6 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     margin-right: 8px; 
     font-size: 1.1em; 
 }
-/* Style du conteneur quand le champ de saisie a le focus */
 .admin-dashboard .search-with-button-wrapper:focus-within {
     border-color: #8b70dd; 
     box-shadow: 0 0 0 0.2rem rgba(94, 44, 237, 0.25);
@@ -783,11 +689,11 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     gap: 30px; 
     margin-top: 20px;
     margin-bottom: 30px;
-    flex-wrap: wrap; /* Les listes passent à la ligne sur les petits écrans */
+    flex-wrap: wrap;
 }
 .top-list {
-    flex: 1; /* Chaque liste prend une part égale de l'espace */
-    min-width: 300px; /* Largeur minimale pour chaque liste */
+    flex: 1;
+    min-width: 300px;
     background-color: #f9f9f9;
     padding: 15px;
     border-radius: 8px;
@@ -811,15 +717,13 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 
 
 /* --- NOTIFICATIONS TOAST (Pop-ups Temporels) --- */
-/* Conteneur fixe pour toutes les notifications toast */
 #toast-container {
-    position: fixed; /* Positionné par rapport à la fenêtre du navigateur */
+    position: fixed;
     top: 20px;
-    right: 20px; /* En haut à droite de l'écran */
-    z-index: 9999; /* Au-dessus de tout le reste */
+    right: 20px;
+    z-index: 9999;
     width: 300px;
 }
-/* Style d'une seule notification toast */
 .toast {
     background-color: #333;
     color: #fff;
@@ -827,20 +731,16 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     border-radius: 8px;
     margin-bottom: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    /* État initial : invisible et en dehors de l'écran à droite */
     opacity: 0;
     transform: translateX(100%);
-    /* Transition fluide pour l'apparition/disparition */
     transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
     font-size: 14px;
     line-height: 1.4;
 }
-/* État visible : la classe .show est ajoutée via JavaScript */
 .toast.show {
     opacity: 1;
-    transform: translateX(0); /* Revient à sa position normale */
+    transform: translateX(0);
 }
-/* Variations de couleur pour les différents types de toasts */
 .toast.toast-success { background-color: #28a745; }
 .toast.toast-info { background-color: #17a2b8; }
 .toast.toast-danger { background-color: #dc3545; }
@@ -857,24 +757,22 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     align-items: center;
     gap: 10px;
 }
-/* Style pour l'avatar de l'utilisateur (cercle avec initiale) */
 .user-avatar {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 38px;
     height: 38px;
-    border-radius: 50%; /* Crée un cercle parfait */
-    background-color: #5c67f2; /* Couleur de fond */
+    border-radius: 50%;
+    background-color: #5c67f2;
     color: #fff;
     font-weight: bold;
     font-size: 16px;
-    cursor: default; /* Curseur normal, ce n'est pas un bouton */
+    cursor: default;
     text-transform: uppercase;
     border: 2px solid #fff;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-/* Style pour un bouton "outline" (bordure seulement) */
 .btn-primary-outline {
     background-color: transparent;
     color: #5c67f2;
@@ -891,7 +789,6 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 
 
 /* --- ÉLÉMENTS MOBILES (Cachés par défaut sur PC) --- */
-/* Le bouton burger, le menu et la superposition sont cachés sur les grands écrans */
 #mobile-menu-toggle,
 #mobile-menu,
 #mobile-menu-overlay {
@@ -900,24 +797,16 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
 
 
 /* --- RESPONSIVE DESIGN --- */
-
-/* Pour les écrans jusqu'à 992px de large (tablettes et en dessous) */
 @media (max-width: 992px) {
-    /* L'en-tête s'adapte pour un affichage vertical */
     .nav-container { position: relative; flex-direction: column; align-items: flex-start; }
-    /* Cache la navigation et les actions de bureau */
     header nav ul { display: none; }
     .header-actions { display: none; }
-    /* La barre de recherche prend toute la largeur */
     .search-form { width: 100%; margin-bottom: 10px; }
     .search-form input { flex-grow: 1; }
     .nav-button, .nav-user { margin-left: 0; margin-top: 5px; width: auto; }
-    /* La page détail produit passe en une seule colonne */
     .product-detail-page { flex-direction: column; }
-
-    /* Affiche le bouton "burger" pour ouvrir le menu mobile */
     #mobile-menu-toggle {
-        display: block; /* Le rend visible */
+        display: block;
         background: none;
         border: 1px solid #ccc;
         color: #333;
@@ -925,67 +814,50 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
         cursor: pointer;
         padding: 5px 10px;
         border-radius: 4px;
-        /* Positionné en haut à droite de l'en-tête */
         position: absolute;
         top: 50%;
         right: 15px;
         transform: translateY(-50%);
     }
-
-    /* Superposition semi-transparente derrière le menu mobile */
     #mobile-menu-overlay {
-        display: block; /* Prêt à être affiché */
-        position: fixed; /* Couvre tout l'écran */
+        display: block;
+        position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1999; /* Juste en dessous du menu */
-        /* Caché par défaut */
+        z-index: 1999;
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
     }
-    /* État ouvert de la superposition */
     #mobile-menu-overlay.open { opacity: 1; visibility: visible; }
-    
-    /* Le menu mobile lui-même (panneau latéral) */
     #mobile-menu {
         display: flex;
-        flex-direction: column; /* Contenu organisé verticalement */
+        flex-direction: column;
         position: fixed;
-        top: 0; left: 0; /* Commence en haut à gauche */
+        top: 0; left: 0;
         width: 85%;
         max-width: 320px;
         height: 100%;
         background-color: #fff;
-        z-index: 2000; /* Au-dessus de tout, y compris l'overlay */
+        z-index: 2000;
         box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        /* État initial : en dehors de l'écran à gauche */
         transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
     }
-    /* État ouvert du menu */
-    #mobile-menu.open { transform: translateX(0); } /* Glisse pour devenir visible */
-
-    /* En-tête à l'intérieur du menu mobile */
+    #mobile-menu.open { transform: translateX(0); }
     .mobile-menu-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #eee; }
     .mobile-menu-header .user-avatar { background-color: #5e2ced; }
     .mobile-menu-username { font-weight: 500; color: #333; }
     #mobile-menu-close { background: none; border: none; font-size: 1.5em; color: #555; cursor: pointer; padding: 0; }
-    
-    /* Contenu principal du menu mobile */
     .mobile-menu-content { padding: 20px; }
     .mobile-menu-content .search-form input { border-radius: 8px 0 0 8px; }
     .mobile-menu-content .search-form button { border-radius: 0 8px 8px 0; }
-    
-    /* Navigation dans le menu mobile */
     .mobile-main-nav ul { list-style: none; padding: 0; margin: 20px 0 0 0; }
     .mobile-main-nav li { border-bottom: 1px solid #f0f0f0; }
     .mobile-main-nav a { color: #333; font-size: 1.1em; font-weight: 500; display: block; padding: 12px 0; }
     .mobile-main-nav a:hover { color: #5e2ced; }
-    
-    /* Pied de page du menu mobile (boutons de connexion/déconnexion) */
     .mobile-menu-footer {
-        margin-top: auto; /* Pousse le pied de page en bas du menu */
+        margin-top: auto;
         padding: 20px;
         display: flex;
         flex-direction: column;
@@ -999,77 +871,58 @@ h3 { font-size: 1.4em; margin-bottom: 10px; } /* Sous-titre */
     .mobile-menu-footer .btn-register-mobile { background-color: #f0f0f0; color: #333; }
 }
 
-
-/* Pour les écrans jusqu'à 768px de large (smartphones) */
 @media (max-width: 768px) {
-    /* Ajustements de taille pour les textes du héros */
     .hero h1 { font-size: 2em; }
     .hero p { font-size: 1em; }
-
-    /* --- CORRECTION FILTRES --- */
-    /* Le formulaire de filtres passe en mode colonne */
     .filters-form {
         flex-direction: column;
         align-items: stretch;
     }
-    /* Chaque champ de filtre prend toute la largeur */
     .filter-group select, .filter-group input[type="text"], .btn-filter {
         width: 100%;
     }
-    
-    /* Les méthodes de contact passent en mode colonne */
     .contact-methods {
         flex-direction: column;
     }
-
-    /* --- CORRECTION PAGINATION (Version avec 'gap') --- */
     .pagination {
         flex-wrap: wrap;
         justify-content: center;
-        /* Applique un espacement de 10px entre les lignes et 5px entre les éléments */
         gap: 10px 5px;
     }
     .page-item {
-        /* On supprime la marge pour laisser 'gap' gérer l'espacement */
         margin: 0;
     }
-
-    /* AMÉLIORATIONS RESPONSIVE POUR LA PAGE D'ACCUEIL */
     h2 { font-size: 1.6em; padding-bottom: 8px; }
     .global-delivery, .popular-categories, .how-to-buy, .featured-products { padding-top: 30px; padding-bottom: 30px; }
     .global-delivery .country-flags { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 15px; }
     .global-delivery .country-flags span { margin: 0; font-size: 1.3em; }
     .featured-products div[style*="text-align: center"] { margin-top: 30px; }
-    
-    /* Force une grille de 2 colonnes pour les catégories sur mobile */
     .categories-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 15px; /* Espace réduit pour les petits écrans */
+        gap: 15px;
     }
     .category-card h3 {
-        font-size: 1em; /* Police plus petite pour un meilleur rendu */
+        font-size: 1em;
         padding: 12px;
     }
     .category-card .category-icon {
-        font-size: 2em; /* Icône légèrement plus petite */
+        font-size: 2em;
     }
-
-    /* Amélioration de la section "Comment Acheter" sur mobile */
     .how-to-buy .steps {
-        grid-template-columns: 1fr; /* Force une seule colonne */
+        grid-template-columns: 1fr;
         gap: 15px;
     }
     .how-to-buy .step {
-        display: flex;        /* Utilise Flexbox pour aligner l'icône et le texte */
-        align-items: center;  /* Centre verticalement */
-        text-align: left;     /* Aligne le texte à gauche pour une meilleure lisibilité */
+        display: flex;
+        align-items: center;
+        text-align: left;
         padding: 15px;
     }
     .how-to-buy .step i {
         display: inline-block;
-        margin-bottom: 0;      /* Supprime la marge du bas */
-        margin-right: 15px;    /* Crée un espace entre l'icône et le texte */
+        margin-bottom: 0;
+        margin-right: 15px;
         font-size: 1.8em;
-        flex-shrink: 0;        /* Empêche l'icône de rétrécir */
+        flex-shrink: 0;
     }
 }
