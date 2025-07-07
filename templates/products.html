@@ -1,3 +1,5 @@
+
+
 {% extends "layout.html" %}
 
 {% block title %}Nos Collections - Luxury Akran{% endblock %}
@@ -102,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </a>
                 <div class="product-card-info">
                     <p class="brand">Marque : ${product.brand}</p>
-                    <p class="price">${product.price_info}</p>
+                    <!-- MODIFIÉ : La ligne du prix a été retirée d'ici aussi -->
                 </div>
                 <div class="product-card-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 5px;">
                     <a href="${product.detail_url}" class="btn btn-details btn-sm" style="flex-grow: 1;">Voir Détails</a>
