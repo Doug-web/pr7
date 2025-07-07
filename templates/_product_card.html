@@ -4,14 +4,13 @@
 
 <div class="product-card">
     <a href="{{ url_for('product_detail', product_id=product.id) }}">
-        <!-- NOUVEAU : Un conteneur pour l'image -->
         <div class="product-image-wrapper">
-            <img src="{{ url_for('static', filename='images/products/' + product.image_file) }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+            <!-- MODIFIÉ : On utilise directement la variable, sans la reconstruire avec url_for -->
+            <img src="{{ product.image_file }}" alt="{{ product.name }}" loading="lazy" decoding="async">
         </div>
         <h3>{{ product.name }}</h3>
     </a>
 
-    <!-- MODIFIÉ : La ligne du prix a été retirée -->
     <div class="product-card-info">
         <p class="brand">Marque : {{ product.brand or 'N/A' }}</p>
     </div>
