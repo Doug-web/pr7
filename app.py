@@ -144,11 +144,18 @@ def get_current_user_favorite_ids():
 # --- Routes publiques ---
 @app.route('/')
 def index():
+    # 1. On récupère les produits depuis la base de données
     featured_products = Product.query.order_by(Product.added_date.desc()).limit(4).all()
-    return render_template('index.html', 
-                           featured_products=featured_products,
-                           favorite_product_ids=get_current_user_favorite_ids())
 
+    # 2. ON TRAITE LES PRODUITS AVANT DE LES ENVOYER AU TEMPLATE (C'est la correction clé !)
+    for product in featured_products:
+        # On remplace le simple nom de fichier par l'URL complète générée par Flask
+        product.image_file = url_for('serve_uploaded_file', path=f'products/{product.image_file}')
+
+    # 3. On envoie maintenant la liste de produits traités à la page
+    return render_template('index.html', 
+                           featured_products=featured_products, # Cette liste contient maintenant les bonnes URLs
+                           favorite_product_ids=get_current_user_favorite_ids())
 
 @app.route('/products')
 #@cache.cached(timeout=3600)
