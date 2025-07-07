@@ -1,12 +1,10 @@
-
-
-
-
 <div class="product-card">
     <a href="{{ url_for('product_detail', product_id=product.id) }}">
         <div class="product-image-wrapper">
-            <!-- MODIFIÉ : On utilise directement la variable, sans la reconstruire avec url_for -->
-            <img src="{{ product.image_file }}" alt="{{ product.name }}" loading="lazy" decoding="async">
+            {# --- LIGNE MODIFIÉE CI-DESSOUS --- #}
+            {# On utilise 'product.image_url' en priorité. S'il n'existe pas, on se rabat sur 'product.image_file'. #}
+            {# Cela rend la carte compatible avec les recommandations ET les autres pages. #}
+            <img src="{{ product.image_url or product.image_file }}" alt="{{ product.name }}" loading="lazy" decoding="async">
         </div>
         <h3>{{ product.name }}</h3>
     </a>
