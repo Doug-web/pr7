@@ -300,7 +300,7 @@ def product_detail(product_id):
         favorite_product_ids = [fav.product_id for fav in current_user.favorites]
 
     # --- LOGIQUE DE RECOMMANDATION HYBRIDE (AVANCÉE) ---
-    target_genders = {'Unisexe'}
+    target_genders = {'mixte'}
     if product.gender:
         target_genders.add(product.gender)
 
@@ -817,7 +817,7 @@ def batch_upload():
                         price_info=product_data.get('price_info', 'Contacter pour prix'),
                         tags=product_data.get('tags'),
                         category=product_data.get('category', 'Non défini'),
-                        gender=product_data.get('gender', 'Unisexe'),
+                        gender=product_data.get('gender', 'mixte'),
                         image_file=filename # Image associée
                     )
                     db.session.add(product)
@@ -913,7 +913,7 @@ def populate_new_data_command(confirm):
             image_file=p_data['image_file'], 
             tags=p_data.get('tags'),
             category=p_data.get('category', 'Non défini'),
-            gender=p_data.get('gender', 'Unisexe')
+            gender=p_data.get('gender', 'mixte')
         )
         db.session.add(product)
         count_added += 1
