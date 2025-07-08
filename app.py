@@ -572,7 +572,7 @@ def admin_dashboard():
      .limit(10).all()
 
     # --- Top 5 produits vus ---
-    most_viewed_products = Product.query.filter(Product.views > 0).order_by(Product.views.desc()).limit(5).all()
+    most_viewed_products = Product.query.filter(Product.views > 0).order_by(Product.views.desc()).limit(10).all()
 
     # --- Requête principale pour la LISTE COMPLÈTE des produits ---
     order_count_subquery = db.session.query(
