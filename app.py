@@ -145,7 +145,7 @@ def get_current_user_favorite_ids():
 @app.route('/')
 def index():
     # 1. On récupère les produits depuis la base de données
-    featured_products = Product.query.order_by(Product.added_date.desc()).limit(4).all()
+    featured_products = Product.query.order_by(Product.added_date.desc()).limit(10).all()
 
     # 2. ON TRAITE LES PRODUITS AVANT DE LES ENVOYER AU TEMPLATE (C'est la correction clé !)
     for product in featured_products:
@@ -312,15 +312,15 @@ def product_detail(product_id):
         Product.category == product.category,
         Product.gender.in_(target_genders),
         Product.id != product.id
-    ).order_by(Product.views.desc()).limit(4).all()
+    ).order_by(Product.views.desc()).limit(10).all()
     for p in recs_by_category:
         if p.id not in recommended_ids:
             recommended_products.append(p)
             recommended_ids.add(p.id)
 
     # 2. Priorité 2: Même marque, bon genre, plus vus
-    if len(recommended_products) < 4 and product.brand:
-        needed = 4 - len(recommended_products)
+    if len(recommended_products) < 10 and product.brand:
+        needed = 10 - len(recommended_products)
         recs_by_brand = Product.query.filter(
             Product.brand == product.brand,
             Product.gender.in_(target_genders),
@@ -332,8 +332,8 @@ def product_detail(product_id):
                 recommended_ids.add(p.id)
 
     # 3. Priorité 3: Même catégorie, bon genre, plus récents
-    if len(recommended_products) < 4:
-        needed = 4 - len(recommended_products)
+    if len(recommended_products) < 10:
+        needed = 10 - len(recommended_products)
         recs_by_date = Product.query.filter(
             Product.category == product.category,
             Product.gender.in_(target_genders),
