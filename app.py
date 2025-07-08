@@ -733,6 +733,114 @@ def delete_product(product_id):
     flash('Produit et toutes ses données associées ont été supprimés avec succès!', 'success')
     return redirect(url_for('admin_dashboard'))
 
+
+# --- AJOUTS DANS app.py (DANS LA SECTION ADMIN) ---
+
+@app.route('/admin/download_csv_template')
+@admin_required
+def download_csv_template():
+    """
+    Fournit un modèle CSV téléchargeable pour l'upload en masse.
+    """
+    # Crée un fichier en mémoire
+    proxy = io.StringIO()
+    # Colonnes attendues dans le CSV
+    fieldnames = ['name', 'brand', 'description', 'price_info', 'tags', 'category', 'gender']
+    writer = csv.writer(proxy)
+    # Écrit l'en-tête (header)
+    writer.writerow(fieldnames)
+    
+    # Prépare la réponse pour le téléchargement
+    mem = io.BytesIO()
+    mem.write(proxy.getvalue().encode('utf-8'))
+    mem.seek(0)
+    proxy.close()
+    
+    return send_file(
+        mem,
+        as_attachment=True,
+        download_name='template_produits.csv',
+        mimetype='text/csv'
+    )
+
+@app.route('/admin/product/batch_upload', methods=['GET', 'POST'])
+@admin_required
+def batch_upload():
+    """
+    Gère l'upload en masse de produits via un fichier CSV et des images.
+    """
+    if request.method == 'POST':
+        csv_file = request.files.get('csv_file')
+        image_files = request.files.getlist('image_files')
+
+        # --- Validations initiales ---
+        if not csv_file or not image_files:
+            flash("Veuillez fournir à la fois un fichier CSV et au moins un fichier image.", "danger")
+            return redirect(url_for('batch_upload'))
+
+        if not csv_file.filename.endswith('.csv'):
+            flash("Le fichier de données doit être au format CSV.", "danger")
+            return redirect(url_for('batch_upload'))
+
+        try:
+            # --- Lecture et traitement du CSV ---
+            # Lire le contenu du fichier CSV en mémoire
+            stream = io.StringIO(csv_file.stream.read().decode("UTF-8"), newline=None)
+            csv_reader = csv.DictReader(stream)
+            product_data_list = list(csv_reader)
+
+            # --- Validation cruciale : correspondance du nombre d'éléments ---
+            if len(product_data_list) != len(image_files):
+                flash(f"Erreur : Le nombre de produits dans le CSV ({len(product_data_list)}) ne correspond pas au nombre d'images ({len(image_files)}).", "danger")
+                return redirect(url_for('batch_upload'))
+            
+            products_added = 0
+            # --- Boucle pour créer chaque produit ---
+            for product_data, image_file in zip(product_data_list, image_files):
+                if image_file and allowed_file(image_file.filename):
+                    # Logique de traitement d'image (reprise de add_product)
+                    random_hex = secrets.token_hex(8)
+                    _, f_ext = os.path.splitext(image_file.filename)
+                    filename = random_hex + f_ext
+                    upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    
+                    output_size = (1000, 1000)
+                    i = Image.open(image_file)
+                    i.thumbnail(output_size)
+                    i.save(upload_path, optimize=True, quality=85)
+
+                    # Création de l'objet Product
+                    product = Product(
+                        name=product_data.get('name', 'Produit sans nom'),
+                        brand=product_data.get('brand'),
+                        description=product_data.get('description'),
+                        price_info=product_data.get('price_info', 'Contacter pour prix'),
+                        tags=product_data.get('tags'),
+                        category=product_data.get('category', 'Non défini'),
+                        gender=product_data.get('gender', 'Unisexe'),
+                        image_file=filename # Image associée
+                    )
+                    db.session.add(product)
+                    products_added += 1
+                else:
+                    # Si un fichier n'est pas une image autorisée, on arrête tout
+                    flash(f"Le fichier '{image_file.filename}' n'est pas un type d'image autorisé. L'opération a été annulée.", "warning")
+                    db.session.rollback() # Annule les ajouts précédents
+                    return redirect(url_for('batch_upload'))
+
+            db.session.commit()
+            flash(f"{products_added} produits ont été ajoutés avec succès !", "success")
+            return redirect(url_for('admin_dashboard'))
+
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Erreur lors de l'upload en masse : {e}")
+            flash(f"Une erreur est survenue lors du traitement. Vérifiez le format de votre fichier CSV. Erreur: {e}", "danger")
+            return redirect(url_for('batch_upload'))
+
+    return render_template('batch_upload.html', title="Ajout en Masse de Produits")
+    
+
 # --- Commandes CLI ---
 @app.cli.command("init-db")
 @click.option('--recreate', is_flag=True, help='Supprime la base de données existante avant de créer (DANGER: perte de données).')
