@@ -6,7 +6,7 @@
 <section class="hero" style="background-image: url('{{ url_for('static', filename='images/hero_bg.jpg') }}');">
     <div class="hero-content container">
         <h1>Découvrez le Luxe à portée de main</h1>
-        <p>Votre source N°1 pour les articles de mode exclusifs, livrés en Afrique et dans le monde.</p>
+        <p>Votre source N°1 pour les articles de mode exclusifs, livrés dans le monde entier.</p>
         <a href="{{ url_for('products_list') }}" class="btn btn-primary">Voir nos collections</a>
     </div>
 </section>
@@ -68,7 +68,7 @@
 
 <section class="featured-products">
     <div class="container">
-        <h2>Produits en Vedette</h2>
+        <h2>Nos Dernières Nouveautés</h2>
         <div class="products-grid">
             {% if featured_products %}
                 {% for p_item in featured_products %}
