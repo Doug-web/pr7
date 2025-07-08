@@ -1,0 +1,55 @@
+<!-- START OF FILE templates/batch_upload.html -->
+
+{% extends "layout.html" %}
+
+{% block title %}{{ title }} - Luxury Akran{% endblock %}
+
+{% block content %}
+<div class="container page-content batch-upload-page">
+    <h1>{{ title }}</h1>
+
+    <div class="upload-instructions">
+        <h2>Comment ça marche ?</h2>
+        <p>
+            Ce formulaire vous permet d'ajouter plusieurs produits en une seule fois. Le système associera chaque ligne de votre fichier CSV à une image, <strong>dans l'ordre où elles sont sélectionnées</strong>.
+        </p>
+        <ol>
+            <li>
+                <strong>Préparez votre fichier CSV :</strong> Téléchargez notre modèle pour vous assurer que les colonnes sont correctes. Remplissez une ligne par produit.
+                <br>
+                <a href="{{ url_for('download_csv_template') }}" class="btn btn-sm btn-secondary mt-2">
+                    <i class="fas fa-download"></i> Télécharger le modèle CSV
+                </a>
+            </li>
+            <li>
+                <strong>Préparez vos images :</strong> Nommez vos images de manière séquentielle si possible (ex: 01.jpg, 02.jpg, ...) pour faciliter la sélection.
+            </li>
+            <li>
+                <strong>Envoyez les fichiers :</strong> Sélectionnez votre fichier CSV, puis sélectionnez TOUTES les images correspondantes. <strong>L'ordre de sélection des images doit correspondre à l'ordre des produits dans le CSV.</strong>
+            </li>
+        </ol>
+        <div class="alert alert-warning mt-3">
+            <strong>Important :</strong> Le nombre de lignes dans votre fichier CSV (sans compter l'en-tête) doit être exactement le même que le nombre d'images que vous sélectionnez.
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('batch_upload') }}" enctype="multipart/form-data" class="mt-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+        <div class="form-group">
+            <label for="csv_file" class="form-label"><strong>Étape 1 : Fichier CSV des produits</strong></label>
+            <input type="file" name="csv_file" id="csv_file" class="form-control" accept=".csv" required>
+        </div>
+
+        <div class="form-group">
+            <label for="image_files" class="form-label"><strong>Étape 2 : Fichiers images correspondants</strong></label>
+            <input type="file" name="image_files" id="image_files" class="form-control" accept="image/png, image/jpeg, image/gif, image/webp" multiple required>
+            <small class="form-text text-muted">Vous pouvez sélectionner plusieurs fichiers à la fois.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg mt-3">
+            <i class="fas fa-file-upload"></i> Lancer l'importation en masse
+        </button>
+    </form>
+</div>
+{% endblock %}
