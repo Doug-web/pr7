@@ -38,19 +38,19 @@ if getattr(sys, 'frozen', False):
     template_dir = os.path.join(application_path, 'templates')
     static_dir = os.path.join(application_path, 'static')
     # Initialisation de l'application Flask avec des chemins explicites pour l'exécutable
-    app = Flask(__name__, 
+    app = Flask(__name__,
                 instance_relative_config=True,
                 template_folder=template_dir,
                 static_folder=static_dir)
 else:
     # Comportement normal en mode développement (python app.py)
     app = Flask(__name__, instance_relative_config=True)
-    
+
 #cache = Cache(app)
 app.config.from_object(Config)
 
 csrf = CSRFProtect(app)
-migrate = Migrate(app, db)  
+migrate = Migrate(app, db)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(days=365)
 
 
@@ -93,11 +93,11 @@ def log_request_info():
 
     if request.endpoint and 'static' not in request.endpoint:
         if current_user.is_authenticated and current_user.is_admin:
-            pass 
+            pass
         else:
             product_id = request.view_args.get('product_id') if request.view_args else None
             ip_addr = request.remote_addr
-            referrer = request.referrer if request.referrer else None 
+            referrer = request.referrer if request.referrer else None
             utm_source_val = request.args.get('utm_source')
             utm_medium_val = request.args.get('utm_medium')
             utm_campaign_val = request.args.get('utm_campaign')
@@ -122,11 +122,11 @@ def log_request_info():
             )
             db.session.add(log_entry)
             db.session.commit()
-    
+
     if current_user.is_authenticated and not current_user.is_admin:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
-    
+
 @app.context_processor
 def inject_now():
     return {'now': datetime.utcnow(), 'config': app.config, 'url_for': url_for}
@@ -153,7 +153,7 @@ def index():
         product.image_file = url_for('serve_uploaded_file', path=f'products/{product.image_file}')
 
     # 3. On envoie maintenant la liste de produits traités à la page
-    return render_template('index.html', 
+    return render_template('index.html',
                            featured_products=featured_products, # Cette liste contient maintenant les bonnes URLs
                            favorite_product_ids=get_current_user_favorite_ids())
 
@@ -167,14 +167,14 @@ def products_list():
     genders_list = [choice[0] for choice in ProductForm.gender_choices]
     active_brands_tuples = db.session.query(Product.brand).filter(Product.brand.isnot(None), Product.brand != '').distinct().order_by(Product.brand).all()
     brands_list = [b[0] for b in active_brands_tuples]
-    
+
     # On récupère TOUS les filtres initiaux depuis l'URL
     initial_query = request.args.get('query', '') # <-- RÉ-AJOUTÉ
     initial_category = request.args.get('category', 'all')
     initial_brand = request.args.get('brand', 'all')
     initial_gender = request.args.get('gender', 'all')
 
-    return render_template('products.html', 
+    return render_template('products.html',
                            categories=categories_list,
                            brands=brands_list,
                            genders=genders_list,
@@ -207,14 +207,14 @@ def api_products_filter():
         products_query = products_query.filter(Product.brand == brand_filter)
     if gender_filter != 'all' and gender_filter:
         products_query = products_query.filter(Product.gender == gender_filter)
-    
+
     try:
         products_pagination = products_query.paginate(page=page, per_page=per_page, error_out=False)
     except Exception as e:
         app.logger.error(f"Erreur de pagination: {e}")
         return jsonify({'products': [], 'pagination': {'total_pages': 0, 'page': page, 'total_items': 0}}), 404
 
-    user_favorite_ids = get_current_user_favorite_ids() 
+    user_favorite_ids = get_current_user_favorite_ids()
 
     products_data = []
     for product in products_pagination.items:
@@ -228,7 +228,7 @@ def api_products_filter():
             'detail_url': url_for('product_detail', product_id=product.id),
             'is_favorite': product.id in user_favorite_ids
         })
-    
+
     return jsonify({
         'products': products_data,
         'pagination': {
@@ -239,7 +239,7 @@ def api_products_filter():
             'next_num': products_pagination.next_num if products_pagination.has_next else None
         }
     })
-    
+
 # --- NOUVELLE ROUTE À AJOUTER ---
 @app.route('/api/filter_options')
 #@cache.cached(timeout=300, query_string=True)
@@ -258,15 +258,15 @@ def api_filter_options():
     # Si une catégorie spécifique est sélectionnée, on filtre les marques
     if category != 'all':
         query = query.filter(Product.category == category)
-    
+
     # (Optionnel) Si on voulait aussi filtrer par genre:
     # if gender != 'all':
     #     query = query.filter(Product.gender == gender)
-    
+
     # On trie les marques par ordre alphabétique pour une meilleure UX
     brands_tuples = query.order_by(Product.brand).all()
     brands_list = [b[0] for b in brands_tuples]
-    
+
     return jsonify({'brands': brands_list})
 
 @app.route('/product/<int:product_id>')
@@ -275,11 +275,11 @@ def product_detail(product_id):
     Affiche la page de détail d'un produit avec une logique de recommandation avancée.
     """
     product = Product.query.get_or_404(product_id)
-    
+
     if not (current_user.is_authenticated and current_user.is_admin):
         product.views = (product.views or 0) + 1
         db.session.commit()
-    
+
     product_page_url = url_for('product_detail', product_id=product.id, _external=True)
     product_image_url = url_for('serve_uploaded_file', path=f'products/{product.image_file}', _external=True)
 
@@ -294,7 +294,7 @@ def product_detail(product_id):
     )
     encoded_message = quote(message_for_whatsapp)
     whatsapp_link = f"https://wa.me/{current_app.config['WHATSAPP_NUMBER']}?text={encoded_message}"
-    
+
     favorite_product_ids = []
     if current_user.is_authenticated and not current_user.is_admin:
         favorite_product_ids = [fav.product_id for fav in current_user.favorites]
@@ -343,7 +343,7 @@ def product_detail(product_id):
              if p.id not in recommended_ids:
                 recommended_products.append(p)
                 recommended_ids.add(p.id)
-                
+
     # --- FIN DE LA LOGIQUE DE RECOMMANDATION ---
 
     # --- CORRECTION AJOUTÉE ICI ---
@@ -378,7 +378,7 @@ def serve_uploaded_file(path):
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    
+
     form = LoginForm()
 
     # Afficher un message spécifique si la redirection est due aux favoris
@@ -387,12 +387,12 @@ def login():
         flashes = session.get('_flashes', [])
         if not any(message_text == "Vous devez être connecté pour ajouter un produit à vos favoris." for category, message_text in flashes):
             flash("Vous devez être connecté pour ajouter un produit à vos favoris.", "info")
-    
+
     if form.validate_on_submit():
         user = User.query.filter((User.email == form.email.data.lower()) | (User.username == form.email.data)).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            
+
             # Tentative de suppression du message spécifique aux favoris s'il est présent,
             # pour ne pas qu'il s'affiche avec le message de succès.
             if '_flashes' in session:
@@ -403,7 +403,7 @@ def login():
             return redirect(next_page or url_for('index'))
         else:
             flash('Échec de la connexion. Vérifiez email/nom d\'utilisateur et mot de passe.', 'danger')
-            
+
     return render_template('login.html', title='Connexion', form=form)
 
 
@@ -417,7 +417,7 @@ def register():
             username=form.username.data,
             email=form.email.data.lower(),
             country=form.country.data,
-            is_admin=False 
+            is_admin=False
         )
         new_user.set_password(form.password.data)
         db.session.add(new_user)
@@ -438,22 +438,22 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/order/product/<int:product_id>', methods=['GET', 'POST'])
-@login_required 
+@login_required
 def place_order(product_id):
     product = Product.query.get_or_404(product_id)
-    form = OrderForm() 
+    form = OrderForm()
 
     if request.method == 'GET':
         form.product_name.data = product.name
-        form.price_info.data = product.price_info 
+        form.price_info.data = product.price_info
         if current_user.is_authenticated:
             form.customer_name.data = form.customer_name.data or current_user.username
             form.customer_email.data = form.customer_email.data or current_user.email
-    
+
     if form.validate_on_submit():
         order = Order(
             product_id=product.id,
-            price_info=form.price_info.data, 
+            price_info=form.price_info.data,
             customer_name=form.customer_name.data,
             customer_email=form.customer_email.data,
             customer_phone=form.customer_phone.data,
@@ -465,7 +465,7 @@ def place_order(product_id):
         db.session.commit()
         flash(f'Votre commande pour "{product.name}" a été passée avec succès! Nous vous contacterons bientôt.', 'success')
         return redirect(url_for('product_detail', product_id=product.id))
-    
+
     return render_template('place_order.html', title=f'Commander: {product.name}', form=form, product=product)
 
 
@@ -493,13 +493,13 @@ def toggle_favorite(product_id):
         message_text = f"'{product.name}' a été ajouté à vos favoris."
         is_now_favorited = True
         message_category = 'success'
-    
+
     db.session.commit()
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest': # AJAX
         return jsonify({
-            'status': 'success', 
-            'message': message_text, 
+            'status': 'success',
+            'message': message_text,
             'is_favorited': is_now_favorited,
             'product_id': product_id # Utile pour identifier le bouton à mettre à jour côté client
         })
@@ -527,14 +527,14 @@ def my_favorites():
     ).order_by(
         Favorite.added_date.desc()
     )
-    
+
     favorite_products_pagination = favorite_products_query.paginate(page=page, per_page=per_page, error_out=False)
-    
+
     # Pour _product_card.html, tous les produits ici sont des favoris.
     # On peut simplement passer les IDs pour être cohérent.
     current_favorite_ids = {p.id for p in favorite_products_pagination.items}
 
-    return render_template('my_favorites.html', 
+    return render_template('my_favorites.html',
                            title="Mes Favoris",
                            products_pagination=favorite_products_pagination,
                            products=favorite_products_pagination.items,
@@ -554,9 +554,14 @@ def admin_required(f):
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
-    # On récupère le terme de recherche depuis l'URL
-    search_query = request.args.get('search_query', '')
-    
+    # On récupère le terme de recherche et la page depuis l'URL
+    search_query = request.args.get('search_query', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = 10 # Nombre de produits par page pour le tableau admin
+    # NOUVEAU : Récupérer la position de défilement depuis l'URL
+    scroll_pos = request.args.get('scroll_pos', 0, type=int)
+
+
     # --- Statistiques rapides (déjà optimisées) ---
     total_products = db.session.query(Product.id).count()
     total_users = db.session.query(User.id).count()
@@ -574,11 +579,11 @@ def admin_dashboard():
     # --- Top 5 produits vus ---
     most_viewed_products = Product.query.filter(Product.views > 0).order_by(Product.views.desc()).limit(10).all()
 
-    # --- Requête principale pour la LISTE COMPLÈTE des produits ---
+    # --- Requête principale pour la LISTE PAGINÉE des produits ---
     order_count_subquery = db.session.query(
         Order.product_id, func.count(Order.id).label('order_count')
     ).group_by(Order.product_id).subquery()
-    
+
     oc_alias = aliased(order_count_subquery)
 
     # On commence la requête de base
@@ -588,7 +593,7 @@ def admin_dashboard():
         oc_alias, Product.id == oc_alias.c.product_id
     )
 
-    # On applique le filtre de recherche si un terme a été fourni
+    # On applique le filtre de recherche si un terme a été fourni (SERVER-SIDE)
     if search_query:
         search_term = f'%{search_query}%'
         query = query.filter(
@@ -598,20 +603,22 @@ def admin_dashboard():
                 Product.category.ilike(search_term)
             )
         )
-    
-    # On trie et on exécute la requête
-    products_list_with_counts = query.order_by(Product.added_date.desc()).all()
+
+    # On trie et on applique la pagination
+    products_pagination = query.order_by(Product.added_date.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
     # --- On passe toutes les données au template ---
-    return render_template('admin_dashboard.html', 
+    return render_template('admin_dashboard.html',
                            total_products=total_products,
                            total_orders=total_orders,
                            total_users=total_users,
                            home_page_views=home_page_views,
                            top_ordered_products=top_ordered_products,
                            most_viewed_products=most_viewed_products,
-                           products=products_list_with_counts,  # <- ON PASSE LA NOUVELLE LISTE ICI
-                           search_query=search_query)
+                           products_pagination=products_pagination, # Passer l'objet pagination
+                           products=products_pagination.items,  # Passer les éléments de la page actuelle
+                           search_query=search_query,
+                           scroll_pos=scroll_pos) # NOUVEAU : Passer la position de défilement au template
 
 @app.route('/admin/product/add', methods=['GET', 'POST'])
 @admin_required
@@ -628,7 +635,7 @@ def add_product():
                 random_hex = secrets.token_hex(8)
                 _, f_ext = os.path.splitext(image_data.filename)
                 filename = random_hex + f_ext
-                
+
                 # 2. Définit le chemin complet pour la sauvegarde
                 upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -654,7 +661,7 @@ def add_product():
         db.session.commit()
         flash('Produit ajouté avec succès!', 'success')
         return redirect(url_for('admin_dashboard'))
-        
+
     return render_template('add_product.html', title='Ajouter Produit', form=form, legend='Ajouter Produit')
 
 @app.route('/admin/product/<int:product_id>/edit', methods=['GET', 'POST'])
@@ -676,7 +683,7 @@ def edit_product(product_id):
         product.gender = form.gender.data
 
         image_data = form.image_file.data
-        
+
         if image_data and hasattr(image_data, 'filename'):
             if allowed_file(image_data.filename):
                 if product.image_file and product.image_file != 'default_product.webp':
@@ -690,12 +697,12 @@ def edit_product(product_id):
                 _, f_ext = os.path.splitext(image_data.filename)
                 filename = random_hex + f_ext
                 upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                
+
                 output_size = (1000, 1000)
                 i = Image.open(image_data)
                 i.thumbnail(output_size)
                 i.save(upload_path, optimize=True, quality=85)
-                
+
                 product.image_file = filename
             else:
                 flash("Type de fichier image non autorisé. L'image n'a pas été mise à jour.", "warning")
@@ -703,7 +710,7 @@ def edit_product(product_id):
         db.session.commit()
         flash('Produit mis à jour avec succès!', 'success')
         return redirect(url_for('admin_dashboard'))
-    
+
     # MODIFIÉ : Utilise la nouvelle route pour afficher l'image actuelle sur la page d'édition
     current_image = url_for('serve_uploaded_file', path=f'products/{product.image_file}')
     return render_template('add_product.html', title='Modifier Produit', form=form, legend=f'Modifier: {product.name}', current_image=current_image)
@@ -713,6 +720,9 @@ def edit_product(product_id):
 def delete_product(product_id):
     product = Product.query.get_or_404(product_id)
     
+    # NOUVEAU : Récupérer la position de défilement pour la redirection
+    scroll_pos = request.form.get('scroll_pos', 0, type=int)
+
     # Étape 1 : Supprimer le fichier image associé (ça, ça ne change pas)
     if product.image_file and product.image_file != 'default_product.webp':
         try:
@@ -731,7 +741,58 @@ def delete_product(product_id):
     db.session.commit()
     
     flash('Produit et toutes ses données associées ont été supprimés avec succès!', 'success')
-    return redirect(url_for('admin_dashboard'))
+    # NOUVEAU : Ajouter scroll_pos à la redirection
+    return redirect(url_for('admin_dashboard', scroll_pos=scroll_pos))
+
+# --- NOUVELLE ROUTE POUR LA SUPPRESSION EN MASSE ---
+@app.route('/admin/product/batch_delete', methods=['POST'])
+@admin_required
+def batch_delete_products():
+    product_ids_to_delete = request.form.getlist('product_ids[]') # Récupère la liste des IDs cochés
+    # NOUVEAU : Récupérer la position de défilement pour la redirection
+    scroll_pos = request.form.get('scroll_pos', 0, type=int)
+
+    deleted_count = 0
+    errors = 0
+
+    if not product_ids_to_delete:
+        flash("Aucun produit sélectionné pour la suppression.", "warning")
+        return redirect(url_for('admin_dashboard', scroll_pos=scroll_pos))
+
+    for product_id in product_ids_to_delete:
+        try:
+            product = Product.query.get(product_id)
+            if product:
+                # Supprimer le fichier image associé
+                if product.image_file and product.image_file != 'default_product.webp':
+                    try:
+                        image_path = os.path.join(app.config['UPLOAD_FOLDER'], product.image_file)
+                        if os.path.exists(image_path):
+                            os.remove(image_path)
+                    except OSError as e:
+                        app.logger.error(f"Erreur lors de la suppression de l'image {product.image_file}: {e}")
+                        # On ne flashe pas pour chaque erreur d'image individuelle
+                        pass # Continuer à supprimer l'entrée DB même si l'image persiste
+
+                db.session.delete(product)
+                deleted_count += 1
+            else:
+                errors += 1
+                app.logger.warning(f"Produit avec ID {product_id} non trouvé pour la suppression en masse.")
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Erreur lors de la suppression du produit {product_id}: {e}")
+            flash(f"Une erreur est survenue lors de la suppression de certains produits. Annulation de l'opération.", "danger")
+            return redirect(url_for('admin_dashboard', scroll_pos=scroll_pos))
+
+    db.session.commit() # Commit une seule fois après toutes les suppressions
+
+    if deleted_count > 0:
+        flash(f"{deleted_count} produit(s) supprimé(s) avec succès.", "success")
+    if errors > 0:
+        flash(f"Attention : {errors} produit(s) n'ont pas pu être trouvés ou supprimés.", "warning")
+
+    return redirect(url_for('admin_dashboard', scroll_pos=scroll_pos))
 
 
 # --- AJOUTS DANS app.py (DANS LA SECTION ADMIN) ---
@@ -749,13 +810,13 @@ def download_csv_template():
     writer = csv.writer(proxy)
     # Écrit l'en-tête (header)
     writer.writerow(fieldnames)
-    
+
     # Prépare la réponse pour le téléchargement
     mem = io.BytesIO()
     mem.write(proxy.getvalue().encode('utf-8'))
     mem.seek(0)
     proxy.close()
-    
+
     return send_file(
         mem,
         as_attachment=True,
@@ -793,7 +854,7 @@ def batch_upload():
             if len(product_data_list) != len(image_files):
                 flash(f"Erreur : Le nombre de produits dans le CSV ({len(product_data_list)}) ne correspond pas au nombre d'images ({len(image_files)}).", "danger")
                 return redirect(url_for('batch_upload'))
-            
+
             products_added = 0
             # --- Boucle pour créer chaque produit ---
             for product_data, image_file in zip(product_data_list, image_files):
@@ -803,7 +864,7 @@ def batch_upload():
                     _, f_ext = os.path.splitext(image_file.filename)
                     filename = random_hex + f_ext
                     upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    
+
                     output_size = (1000, 1000)
                     i = Image.open(image_file)
                     i.thumbnail(output_size)
@@ -839,7 +900,7 @@ def batch_upload():
             return redirect(url_for('batch_upload'))
 
     return render_template('batch_upload.html', title="Ajout en Masse de Produits")
-    
+
 
 # --- Commandes CLI ---
 @app.cli.command("init-db")
@@ -847,7 +908,7 @@ def batch_upload():
 def init_db_command(recreate):
     """Initialise la base de données SQLite."""
     db_path = os.path.join(app.instance_path, app.config['SQLALCHEMY_DATABASE_URI'].split('///')[1])
-    
+
     if recreate:
         if click.confirm(f'ATTENTION: Cela va supprimer le fichier de base de données existant ({db_path}). Êtes-vous sûr ?', abort=True):
             click.echo('Suppression de la base de données SQLite existante...')
@@ -855,7 +916,7 @@ def init_db_command(recreate):
                 os.remove(db_path)
             # db.drop_all() n'est pas toujours fiable pour supprimer le fichier lui-même, la suppression directe est mieux.
             click.echo('Base de données SQLite supprimée.')
-    
+
     if os.path.exists(db_path):
         click.echo(f"Le fichier de base de données '{db_path}' existe déjà. Utiliser --recreate pour le remplacer.")
         return
@@ -863,7 +924,7 @@ def init_db_command(recreate):
     click.echo('Création des tables dans la base de données SQLite...')
     # create_all ne fonctionne que dans un contexte d'application
     with app.app_context():
-        db.create_all() 
+        db.create_all()
     click.echo('Tables créées avec succès.')
     click.echo(f"Base de données initialisée ici : {db_path}")
 
@@ -872,7 +933,7 @@ def create_admin_command():
     username = input("Entrez le nom d'utilisateur de l'admin: ")
     email = input("Entrez l'email de l'admin: ")
     password = input("Entrez le mot de passe de l'admin: ")
-    
+
     with app.app_context(): # Bonne pratique d'envelopper les commandes dans un contexte d'app
         if User.query.filter((User.email == email.lower()) | (User.username == username)).first():
             print("Un utilisateur avec cet email ou nom d'utilisateur existe déjà.")
@@ -882,7 +943,7 @@ def create_admin_command():
         db.session.add(admin_user)
         db.session.commit()
     print(f"Utilisateur admin '{username}' créé avec succès.")
-    
+
 
 @app.cli.command("populate-new-data")
 @click.option('--confirm', is_flag=True, help='Confirmer avant d\'ajouter les données si des produits existent déjà.')
@@ -910,22 +971,22 @@ def populate_new_data_command(confirm):
             brand=p_data.get('brand'),
             description=p_data.get('description'),
             price_info=p_data.get('price_info', 'Contacter pour prix'),
-            image_file=p_data['image_file'], 
+            image_file=p_data['image_file'],
             tags=p_data.get('tags'),
             category=p_data.get('category', 'Non défini'),
             gender=p_data.get('gender', 'mixte')
         )
         db.session.add(product)
         count_added += 1
-    
+
     try:
         db.session.commit()
         click.echo(f"{count_added} nouveaux produits ajoutés avec succès à la base de données.", color='green')
     except Exception as e:
         db.session.rollback()
         click.echo(f"Erreur lors de l'ajout des produits : {e}", err=True, color='red')
-        
-        
+
+
 
 if __name__ == '__main__':
     app.run(port=5008, debug=True)
