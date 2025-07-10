@@ -911,7 +911,7 @@ def init_db_command(recreate):
 
     if recreate:
         if click.confirm(f'ATTENTION: Cela va supprimer le fichier de base de données existant ({db_path}). Êtes-vous sûr ?', abort=True):
-            click.echo('Suppression de la base de données SQLite existante...')
+            click.echo('Suppression de la base de données SQLite existente...')
             if os.path.exists(db_path):
                 os.remove(db_path)
             # db.drop_all() n'est pas toujours fiable pour supprimer le fichier lui-même, la suppression directe est mieux.
