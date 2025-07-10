@@ -201,6 +201,16 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
     border-color: #dc3545;
     text-decoration: none;
 }
+/* For disabled state */
+.btn-outline-danger:disabled,
+.btn-outline-danger[disabled] {
+    opacity: 0.65;
+    cursor: not-allowed;
+    background-color: transparent; /* Ensure it stays transparent */
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
 
 /* --- GRILLE DE PRODUITS --- */
 .products-grid {
@@ -783,6 +793,17 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
     display: none;
 }
 
+/* Batch actions container */
+.batch-actions-container {
+    margin-top: -10px; /* Adjust if needed to align with search bar */
+    margin-bottom: 15px;
+    text-align: right; /* Align the button to the right */
+}
+
+.batch-actions-container .btn {
+    margin-bottom: 5px; /* For mobile responsiveness */
+}
+
 
 /* --- RESPONSIVE DESIGN --- */
 @media (max-width: 992px) {
@@ -857,6 +878,11 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
     .mobile-menu-footer .btn { flex: 1; text-align: center; }
     .mobile-menu-footer .btn-login-mobile { background-color: #5e2ced; color: white; }
     .mobile-menu-footer .btn-register-mobile { background-color: #f0f0f0; color: #333; }
+
+    /* Admin dashboard adjustments */
+    .batch-actions-container {
+        text-align: center; /* Center the button on smaller screens */
+    }
 }
 
 @media (max-width: 768px) {
@@ -933,5 +959,37 @@ h3 { font-size: 1.4em; margin-bottom: 10px; }
         margin-right: 15px;
         font-size: 1.8em;
         flex-shrink: 0;
+    }
+
+    /* Admin dashboard adjustments for small screens */
+    .batch-actions-container {
+        text-align: center;
+    }
+    .batch-actions-container .btn {
+        width: 100%; /* Make button full width on small screens */
+    }
+    .admin-dashboard table th, .admin-dashboard table td {
+        padding: 8px; /* Slightly reduce padding for more compact table on small screens */
+        font-size: 0.9em; /* Smaller font for table content */
+    }
+    .admin-thumb {
+        width: 40px; /* Smaller thumbnails */
+        height: 40px;
+    }
+    /* Hide some less critical columns on very small screens for readability */
+    /* Checkbox column will always be visible as it's the first child (nth-child(1)) */
+    /* Image column (nth-child(2)) */
+    /* Name (nth-child(3)) */
+    /* Brand (nth-child(4)) */
+    /* Category (nth-child(5)) */
+    /* Price Info (nth-child(6)) */
+    /* Views (nth-child(7)) */
+    /* Orders (nth-child(8)) */
+    /* Actions (nth-child(9)) */
+    
+    /* Example: Hide Category and Views on very small screens */
+    .admin-dashboard table th:nth-child(5), .admin-dashboard table td:nth-child(5), /* Category */
+    .admin-dashboard table th:nth-child(7), .admin-dashboard table td:nth-child(7) { /* Views */
+        display: none;
     }
 }
