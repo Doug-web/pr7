@@ -1,4 +1,4 @@
-
+--- START OF FILE admin_dashboard.html ---
 
 {% extends "layout.html" %}
 
@@ -29,7 +29,7 @@
                 <p>{{ home_page_views }}</p>
             </div>
         </div>
-        
+
         <div class="top-lists-container">
             <div class="top-list">
                 <h3>Top 10 Produits Commandés</h3>
@@ -43,7 +43,7 @@
                 <p>Aucune donnée de commande pour le moment.</p>
                 {% endif %}
             </div>
-              
+
             <div class="top-list">
                 <h3>Top 10 Produits les plus Vus</h3>
                 {% if most_viewed_products %}
@@ -64,71 +64,118 @@
         <h2>Actions</h2>
         <a href="{{ url_for('add_product') }}" class="btn btn-success"><i class="fas fa-plus-circle"></i> Ajouter un Produit</a>
         <a href="{{ url_for('batch_upload') }}" class="btn btn-info"><i class="fas fa-file-upload"></i> Ajouter en Masse (CSV)</a>
-                
+
         <!-- Les boutons de téléchargement ont été supprimés de cette section -->
     </section>
 
     <!-- Section de gestion des produits -->
     <section class="admin-products-list">
         <h2>Gérer les Produits</h2>
-        
-        <!-- Barre de recherche des produits -->
-        <div class="admin-product-search-form-container">
-            <div class="search-with-button-wrapper">
-                <input type="text" id="adminProductSearchInput" 
-                       placeholder="Rechercher un produit (nom, marque, catégorie)..." 
-                       value="{{ search_query or '' }}"
-                       class="form-control admin-search-input-field">
-                <button type="button" id="adminSearchButton" class="btn btn-search-admin">
-                    <i class="fas fa-search"></i> Rechercher
+
+        <!-- Barre de recherche des produits - CHANGED TO SERVER-SIDE SEARCH -->
+        <form id="adminSearchForm" method="GET" action="{{ url_for('admin_dashboard') }}">
+            <div class="admin-product-search-form-container">
+                <div class="search-with-button-wrapper">
+                    <input type="text" name="search_query" id="adminProductSearchInput"
+                           placeholder="Rechercher un produit (nom, marque, catégorie)..."
+                           value="{{ search_query or '' }}"
+                           class="form-control admin-search-input-field">
+                    <button type="submit" id="adminSearchButton" class="btn btn-search-admin">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+            </div>
+            {# NOUVEAU : Champ caché pour la position de défilement #}
+            <input type="hidden" name="scroll_pos" id="scrollPosSearch" value="{{ scroll_pos }}">
+        </form>
+
+        <!-- FORM for Batch Delete -->
+        <form id="batchDeleteForm" action="{{ url_for('batch_delete_products') }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer les produits sélectionnés ? Cette action est irréversible.');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            {# NOUVEAU : Champ caché pour la position de défilement #}
+            <input type="hidden" name="scroll_pos" id="scrollPosBatchDelete" value="{{ scroll_pos }}">
+
+            {% if products %}
+            <div class="batch-actions-container">
+                <button type="submit" class="btn btn-outline-danger" id="batchDeleteButton" disabled>
+                    <i class="fas fa-trash-alt"></i> Supprimer la sélection (<span id="selectedCount">0</span>)
                 </button>
             </div>
-        </div>
+            <table id="adminProductsTable">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAllProducts"></th> {# Select All Checkbox #}
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Marque</th>
+                        <th>Catégorie</th>
+                        <th>Prix Info</th>
+                        <th>Vues</th>
+                        <th>Commandes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product, order_count in products_pagination.items %} {# Use items from pagination #}
+                    <tr class="product-row">
+                        <td><input type="checkbox" name="product_ids[]" value="{{ product.id }}" class="product-checkbox"></td> {# Individual Checkbox #}
+                        <td><img src="{{ url_for('serve_uploaded_file', path='products/' + product.image_file) }}" alt="{{ product.name }}" class="admin-thumb"></td>
+                        <td class="product-name">{{ product.name }}</td>
+                        <td class="product-brand">{{ product.brand or 'N/A' }}</td>
+                        <td class="product-category">{{ product.category or 'N/A' }}</td>
+                        <td>{{ product.price_info }}</td>
+                        <td>{{ product.views or 0 }}</td>
+                        <td>{{ order_count or 0 }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-sm btn-warning" title="Modifier"><i class="fas fa-edit"></i></a>
+                            {# MODIFIED: Add scroll_pos to individual delete form #}
+                            <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                {# NOUVEAU : Champ caché pour la position de défilement #}
+                                <input type="hidden" name="scroll_pos" class="scroll-pos-delete-single">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-        {% if products %}
-        <table id="adminProductsTable">
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Nom</th>
-                    <th>Marque</th>
-                    <th>Catégorie</th>
-                    <th>Prix Info</th>
-                    <th>Vues</th>
-                    <th>Commandes</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product, order_count in products %}
-                <tr class="product-row">
-                    <!-- MODIFICATION CI-DESSOUS -->
-                    <td><img src="{{ url_for('serve_uploaded_file', path='products/' + product.image_file) }}" alt="{{ product.name }}" class="admin-thumb"></td>
-                    <td class="product-name">{{ product.name }}</td>
-                    <td class="product-brand">{{ product.brand or 'N/A' }}</td>
-                    <td class="product-category">{{ product.category or 'N/A' }}</td>
-                    <td>{{ product.price_info }}</td>
-                    <td>{{ product.views or 0 }}</td>
-                    <td>{{ order_count or 0 }}</td>
-                    <td>
-                        <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-sm btn-warning" title="Modifier"><i class="fas fa-edit"></i></a>
-                        <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p>Aucun produit à afficher. <a href="{{ url_for('add_product') }}">Ajoutez-en un !</a></p>
-        {% endif %}
-        
-        <!-- Message affiché si la recherche ne retourne aucun résultat -->
-        <div id="noResultsMessage" style="display: none; text-align: center; margin-top: 20px;">
-            <p>Aucun produit ne correspond à votre recherche.</p>
-        </div>
+            {# Pagination Controls #}
+            <nav class="pagination-nav">
+                <ul class="pagination">
+                    {% if products_pagination.has_prev %}
+                        {# MODIFIED: Add scroll_pos to pagination links #}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('admin_dashboard', page=products_pagination.prev_num, search_query=search_query, scroll_pos=scroll_pos) }}">Précédent</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Précédent</span></li>
+                    {% endif %}
+
+                    {% for page_num in products_pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if page_num %}
+                            {% if products_pagination.page == page_num %}
+                                <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                            {% else %}
+                                {# MODIFIED: Add scroll_pos to pagination links #}
+                                <li class="page-item"><a class="page-link" href="{{ url_for('admin_dashboard', page=page_num, search_query=search_query, scroll_pos=scroll_pos) }}">{{ page_num }}</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if products_pagination.has_next %}
+                        {# MODIFIED: Add scroll_pos to pagination links #}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('admin_dashboard', page=products_pagination.next_num, search_query=search_query, scroll_pos=scroll_pos) }}">Suivant</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Suivant</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% else %}
+                <p>Aucun produit à afficher. <a href="{{ url_for('add_product') }}">Ajoutez-en un !</a></p>
+            {% endif %}
+        </form>
     </section>
 </div>
 {% endblock %}
@@ -136,71 +183,112 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('adminProductSearchInput');
-    const productsTable = document.getElementById('adminProductsTable');
-    const noResultsMessage = document.getElementById('noResultsMessage');
+    // --- Scroll Position Management ---
+    const searchForm = document.getElementById('adminSearchForm');
+    const scrollPosSearchInput = document.getElementById('scrollPosSearch');
+    const batchDeleteForm = document.getElementById('batchDeleteForm');
+    const scrollPosBatchDeleteInput = document.getElementById('scrollPosBatchDelete');
+    const singleDeleteScrollInputs = document.querySelectorAll('.scroll-pos-delete-single');
+    const paginationLinks = document.querySelectorAll('.pagination-nav .page-link');
 
-    // Vérifie si la table des produits existe avant d'ajouter des écouteurs d'événements
-    if (productsTable) {
-        const tableBody = productsTable.getElementsByTagName('tbody')[0];
-        const productRows = tableBody ? tableBody.getElementsByClassName('product-row') : [];
-        const searchButton = document.getElementById('adminSearchButton');
-
-        function filterProducts() {
-            // S'il n'y a aucune ligne de produit, il n'y a rien à filtrer
-            if (!productRows || productRows.length === 0) {
-                if (noResultsMessage) noResultsMessage.style.display = 'none';
-                return;
-            }
-
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            let visibleCount = 0;
-
-            for (let i = 0; i < productRows.length; i++) {
-                const row = productRows[i];
-                const nameCell = row.querySelector('.product-name');
-                const brandCell = row.querySelector('.product-brand');
-                const categoryCell = row.querySelector('.product-category');
-
-                const name = nameCell ? nameCell.textContent.toLowerCase() : "";
-                const brand = brandCell ? brandCell.textContent.toLowerCase() : "";
-                const category = categoryCell ? categoryCell.textContent.toLowerCase() : "";
-
-                // La ligne est affichée si le terme de recherche est trouvé dans le nom, la marque ou la catégorie
-                if (name.includes(searchTerm) || brand.includes(searchTerm) || category.includes(searchTerm)) {
-                    row.style.display = ''; // Affiche la ligne
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none'; // Masque la ligne
-                }
-            }
-            
-            // Gère l'affichage du message "aucun résultat"
-            if (noResultsMessage) {
-                // Affiche le message seulement si une recherche a été effectuée et qu'aucun résultat n'est trouvé
-                if (visibleCount === 0 && searchTerm !== "") {
-                    noResultsMessage.style.display = 'block';
-                } else {
-                    noResultsMessage.style.display = 'none';
-                }
-            }
+    // Function to save scroll position before form submission or link click
+    function saveScrollPosition() {
+        const currentScrollPos = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollPosSearchInput) {
+            scrollPosSearchInput.value = currentScrollPos;
         }
-
-        // Ajoute l'écouteur d'événement pour la saisie en temps réel
-        if (searchInput) {
-            searchInput.addEventListener('keyup', filterProducts);
+        if (scrollPosBatchDeleteInput) {
+            scrollPosBatchDeleteInput.value = currentScrollPos;
         }
+        singleDeleteScrollInputs.forEach(input => {
+            input.value = currentScrollPos;
+        });
 
-        // Ajoute l'écouteur d'événement pour le clic sur le bouton
-        if (searchButton) {
-            searchButton.addEventListener('click', filterProducts);
-        }
-
-        // S'il y a déjà du texte dans le champ au chargement de la page, lance le filtre
-        if (searchInput && searchInput.value.trim() !== '') {
-            filterProducts();
-        }
+        // For pagination links, modify their href to include scroll_pos
+        // This is important because the URL is generated by Flask, but if JS handles the click,
+        // we can update it before navigating. However, Flask already includes it in the href,
+        // so this part is more for robustness if hrefs were not already templated with scroll_pos.
+        paginationLinks.forEach(link => {
+            const url = new URL(link.href);
+            url.searchParams.set('scroll_pos', currentScrollPos);
+            link.href = url.toString();
+        });
     }
+
+    // Attach event listeners to forms for saving scroll position
+    if (searchForm) {
+        searchForm.addEventListener('submit', saveScrollPosition);
+    }
+    if (batchDeleteForm) {
+        batchDeleteForm.addEventListener('submit', saveScrollPosition);
+    }
+    // For single delete forms, attach to the submit event of the form itself
+    document.querySelectorAll('.product-row form[action*="/delete"]').forEach(form => {
+        form.addEventListener('submit', saveScrollPosition);
+    });
+
+    // Restore scroll position after page load
+    const urlParams = new URLSearchParams(window.location.search);
+    const savedScrollPos = urlParams.get('scroll_pos');
+    if (savedScrollPos) {
+        // Use requestAnimationFrame for smoother scroll and to ensure DOM is ready
+        requestAnimationFrame(() => {
+            window.scrollTo(0, parseInt(savedScrollPos, 10));
+        });
+    }
+
+
+    // --- Batch Delete Logic (Existing code, kept for completeness) ---
+    const selectAllCheckbox = document.getElementById('selectAllProducts');
+    const productCheckboxes = document.querySelectorAll('.product-checkbox');
+    const batchDeleteButton = document.getElementById('batchDeleteButton');
+    const selectedCountSpan = document.getElementById('selectedCount');
+
+    function updateBatchDeleteButton() {
+        let checkedCount = 0;
+        productCheckboxes.forEach(cb => {
+            if (cb.checked) {
+                checkedCount++;
+            }
+        });
+        selectedCountSpan.textContent = checkedCount;
+        batchDeleteButton.disabled = checkedCount === 0;
+    }
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function () {
+            productCheckboxes.forEach(cb => {
+                cb.checked = this.checked;
+            });
+            updateBatchDeleteButton();
+        });
+    }
+
+    productCheckboxes.forEach(cb => {
+        cb.addEventListener('change', function () {
+            // If any product checkbox is unchecked, uncheck "select all"
+            if (!this.checked) {
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = false;
+                }
+            } else {
+                // If all product checkboxes are checked, check "select all"
+                let allChecked = true;
+                productCheckboxes.forEach(innerCb => {
+                    if (!innerCb.checked) {
+                        allChecked = false;
+                    }
+                });
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = allChecked;
+                }
+            }
+            updateBatchDeleteButton();
+        });
+    });
+
+    // Initial update of the button state
+    updateBatchDeleteButton();
 });
 </script>
 {% endblock %}
