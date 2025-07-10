@@ -530,6 +530,15 @@ def my_favorites():
 
     favorite_products_pagination = favorite_products_query.paginate(page=page, per_page=per_page, error_out=False)
 
+    # --- DÉBUT DE LA CORRECTION : PRÉPARER LES URLS D'IMAGE POUR LE TEMPLATE ---
+    products_for_template = []
+    for product in favorite_products_pagination.items:
+        # Assurez-vous que l'image_file est traitée pour obtenir l'URL complète
+        # Créer un nouvel attribut 'image_url' pour ne pas modifier l'objet SQLAlchemy original
+        product.image_url = url_for('serve_uploaded_file', path=f'products/{product.image_file}')
+        products_for_template.append(product)
+    # --- FIN DE LA CORRECTION ---
+
     # Pour _product_card.html, tous les produits ici sont des favoris.
     # On peut simplement passer les IDs pour être cohérent.
     current_favorite_ids = {p.id for p in favorite_products_pagination.items}
@@ -537,9 +546,9 @@ def my_favorites():
     return render_template('my_favorites.html',
                            title="Mes Favoris",
                            products_pagination=favorite_products_pagination,
-                           products=favorite_products_pagination.items,
+                           products=products_for_template, # Passez la liste de produits avec les URLs d'image corrigées
                            favorite_product_ids=current_favorite_ids)
-
+    
 # --- Fonctions et routes Admin ---
 def admin_required(f):
     @login_required
